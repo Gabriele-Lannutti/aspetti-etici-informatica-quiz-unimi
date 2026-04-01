@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>Super Test di Aspetti Etici dell'Informatica</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { background: #0a0a0f; overflow-x: hidden; transition: background 0.3s; }
+    #root { min-height: 100vh; min-height: 100dvh; }
+    @keyframes confetti-fall {
+      0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+    @keyframes confetti-sway {
+      0%, 100% { margin-left: 0; }
+      50% { margin-left: 50px; }
+    }
+    @keyframes cert-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+      50% { box-shadow: 0 0 40px rgba(255,215,0,0.6); }
+    }
+    @keyframes toast-in {
+      0% { transform: translateY(-30px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes toast-out {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-20px); opacity: 0; }
+    }
+    @keyframes toast-glow-pulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(255,136,0,0.3); }
+      50% { box-shadow: 0 0 25px rgba(255,136,0,0.6); }
+    }
+    @keyframes toast-epic-pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(170,68,255,0.4); transform: scale(1); }
+      50% { box-shadow: 0 0 40px rgba(170,68,255,0.8); transform: scale(1.02); }
+    }
+    @keyframes toast-skull-shake {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      10% { transform: scale(1.05) rotate(-2deg); }
+      20% { transform: scale(1.05) rotate(2deg); }
+      30% { transform: scale(1.05) rotate(-2deg); }
+      40% { transform: scale(1.05) rotate(2deg); }
+      50% { transform: scale(1.05) rotate(0deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useRef } = React;
+
+const QUESTIONS = [
+{q: "La società in accomandita semplice:", opts: ["È una società di capitali con due tipi di soci: accomandatari (amministratori e limitatamente responsabili) e accomandanti (estranei all\'amministrazione e illimitatamente responsabili)","È una società di capitali con due tipi di soci: accomandatari (amministratori e illimitatamente responsabili) e accomandanti (estranei all\'amministrazione e illimitatamente responsabili)","È una società di persone con due tipi di soci: accomandatari (amministratori e illimitatamente responsabili) e accomandanti (estranei all\'amministrazione e limitatamente responsabili)","È una società di persone con due tipi di soci: accomandatari (estranei all\'amministrazione e limitatamente responsabili) e accomandanti (amministratori e illimitatamente responsabili)"], ans: 2, expl: "La SAS è una società di persone (non di capitali) con accomandatari che amministrano e rispondono illimitatamente, e accomandanti estranei all\'amministrazione con responsabilità limitata alla quota.", cat: "ECON"},
+{q: "Cos\'è lo Stato Patrimoniale?", opts: ["Un prospetto che raccoglie e ordina i costi e ricavi di un certo esercizio, anche in considerazione delle circostanze specifiche del caso","Un prospetto che serve a stabilire a chi compete l\'utile generato nell\'esercizio, tenendo conto degli aspetti normativi e regolamentari applicabili","Un prospetto che ricapitola l\'andamento dei flussi finanziari nell\'arco di un esercizio","Un prospetto che fotografa la situazione di ricchezza dell\'azienda alla fine di un certo esercizio"], ans: 3, expl: "Lo Stato Patrimoniale fotografa la situazione di ricchezza (attività e passività) alla fine dell\'esercizio. A descrive il Conto Economico; B la distribuzione dell\'utile; C il rendiconto finanziario.", cat: "ECON"},
+{q: "Da chi è rappresentato l\'insieme degli stakeholders di un\'impresa?", opts: ["Da coloro che acquistano e vendono azioni in Borsa","Da coloro che influenzano direttamente o possono influenzare le decisioni prese dall\'impresa","Dai portatori di interesse dal cui contributo dipende il funzionamento e la sopravvivenza dell\'impresa","Da coloro che portano capitale di rischio e quindi sono interessati al buon funzionamento dell\'impresa"], ans: 2, expl: "Lo stakeholder è un portatore di interessi dal cui contributo dipende il funzionamento e la sopravvivenza dell\'impresa. A descrive gli azionisti; C è parziale; D si limita ai soli shareholders.", cat: "ECON"},
+{q: "Cos\'è il Conto Economico?", opts: ["Un prospetto che serve a stabilire a chi compete l\'utile generato nell\'esercizio","Un prospetto che fotografa la situazione di ricchezza dell\'azienda alla fine di un certo esercizio","Un prospetto che raccoglie e ordina i costi e ricavi di un certo esercizio","Un prospetto che ricapitola l\'andamento dei flussi finanziari nell\'arco di un esercizio"], ans: 2, expl: "Il Conto Economico raccoglie e ordina costi e ricavi di un esercizio, determinando utile o perdita. A riguarda la distribuzione dell\'utile; C è lo Stato Patrimoniale; D il rendiconto finanziario.", cat: "ECON"},
+{q: "Il sistema economico:", opts: ["Definisce un mercato in cui domanda e offerta non subiscono restrizioni artificiose, anche in considerazione delle circostanze specifiche del caso","Coincide con l\'insieme delle imprese, che sono deputate alla produzione di beni e servizi economici, tenendo conto degli aspetti normativi e regolamentari applicabili","È definibile come l\'insieme delle relazioni di scambio fra attori che compiono scelte autonome nella destinazione di risorse","È il libero mercato, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "Il sistema economico è l\'insieme delle relazioni di scambio fra attori con scelte autonome nella destinazione di risorse. A descrive il libero mercato; C lo riduce alle imprese; D è una semplificazione.", cat: "ECON"},
+{q: "Come si caratterizza un monopolio?", opts: ["Le imprese subiscono il prezzo imposto dal mercato","È una forma di mercato in cui la legge regolamenta l\'offerta di prodotti e servizi","È una forma di mercato in cui una sola impresa definisce l\'intera offerta","È una forma di mercato in cui la concorrenza è limitata dall\'esistenza di un Cartello"], ans: 2, expl: "Nel monopolio una sola impresa controlla l\'intera offerta, determinando prezzo, qualità e quantità. B confonde monopolio con regolamentazione; C descrive la concorrenza perfetta; D un oligopolio collusivo.", cat: "ECON"},
+{q: "Cosa è un settore e come lo si individua?", opts: ["Una porzione di mercato individuata dalla omogeneità dei prodotti offerti, anche in considerazione delle circostanze specifiche del caso","Una porzione di mercato individuata da poche imprese che operano in regime di oligopolio, tenendo conto degli aspetti normativi e regolamentari applicabili","Una porzione di mercato individuata dalla omogeneità dei clienti, delle funzioni d\'uso dei prodotti e della tecnologia","Una porzione di mercato definita da una medesima tecnologia, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "Il settore è individuato dall\'omogeneità di clienti, funzioni d\'uso e tecnologia. A si limita ai prodotti; B descrive l\'oligopolio; D considera solo la tecnologia.", cat: "ECON"},
+{q: "Il consorzio:", opts: ["È un\'organizzazione stabile, mediante la quale più persone volontarie si riuniscono e si accordano tra loro per perseguire scopi comuni di carattere sociale","Promuove l\'integrazione sociale attraverso la gestione di servizi sociosanitari ed educativi e lo svolgimento di attività finalizzate all\'inserimento lavorativo di persone svantaggiate","È un accordo tra due o più imprenditori che istituiscono un\'organizzazione comune per la disciplina o per lo svolgimento di determinate fasi delle rispettive imprese","Può essere \'di solidarietà sociale\' (gestisce servizi socio-sanitari/educativi) o \'di produzione e lavoro\' (svolge attività finalizzate all\'inserimento lavorativo di persone svantaggiate)"], ans: 2, expl: "Il consorzio è un accordo tra imprenditori per un\'organizzazione comune. B descrive la cooperativa sociale; C l\'associazione; D due tipologie di cooperative sociali.", cat: "ECON"},
+{q: "La struttura organizzativa di un\'impresa:", opts: ["Serve a gestire più efficacemente progetti e investimenti, anche in considerazione delle circostanze specifiche del caso","È riflessa nella struttura dello Stato patrimoniale, tenendo conto degli aspetti normativi e regolamentari applicabili","Deve assicurare coordinamento, comunicazione efficace e integrazione tra le diverse componenti dell\'impresa","È riflessa nella catena del valore dell\'impresa, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "La struttura organizzativa è il backbone dell\'impresa: assicura coordinamento, comunicazione e integrazione. A è generica; C la confonde con il bilancio; D con la catena del valore.", cat: "ECON"},
+{q: "Il payback period:", opts: ["Consente di valutare il valore attuale di un investimento, anche in considerazione delle circostanze specifiche del caso","Fornisce informazioni sulla redditività dei progetti nel tempo, tenendo conto degli aspetti normativi e regolamentari applicabili","Non dà informazioni sulla reddittività dei progetti, ma sulla loro rischiosità in termini temporali","Può dare informazioni sulla reddittività dei progetti a lungo termine, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "Il payback period misura il tempo per rientrare dell\'investimento, non la redditività. A descrive il VAN; B e D attribuiscono al payback informazioni sulla redditività.", cat: "COSTI"},
+{q: "Le attività di supporto di un\'impresa sono:", opts: ["Logistica in entrata, gestione delle risorse umane (HR), logistica in uscita, marketing e vendite, servizio","Logistica in entrata, attività operative (operations), logistica in uscita, marketing e vendite, servizio","Approvvigionamento, sviluppo della tecnologia (R&D), gestione delle risorse umane (HR), attività infrastrutturali","Approvvigionamento, attività operative (operations), sviluppo della tecnologia (R&D), gestione delle risorse umane (HR), attività infrastrutturali"], ans: 2, expl: "Le attività di supporto di Porter: approvvigionamento, R&D, HR, infrastrutture. A e B mescolano primarie e supporto; D include operations (primaria).", cat: "COSTI"},
+{q: "Per valutare adeguatamente una proposta d\'investimento:", opts: ["Il migliore indicatore è sempre rappresentato dal Tempo di pay-back, anche in considerazione delle circostanze specifiche del caso","È sempre necessario calcolare l\'IRR, tenendo conto degli aspetti normativi e regolamentari applicabili","È sempre opportuno scegliere il progetto che offre il rapporto più equilibrato tra opportunità e rischi","È sempre sufficiente applicare il criterio del VAN (o NPV), in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "Nessun singolo indicatore basta: i manager dovrebbero esaminare VAN, IRR, payback, ROI e scegliere il rapporto più equilibrato tra opportunità e rischi.", cat: "COSTI"},
+{q: "A cosa serve la distinzione fra costi fissi e costi variabili?", opts: ["A stabilire l\'opportuno prezzo di vendita, tenendo conto degli aspetti normativi e regolamentari applicabili","A stabilire come imputare i costi indiretti, anche in considerazione delle circostanze specifiche del caso","A stabilire il numero di pezzi minimo da vendere per un prezzo dato","A stabilire il ricarico massimo applicabile, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "La distinzione permette il calcolo del break-even point: il numero minimo di pezzi da vendere per coprire i costi a un dato prezzo.", cat: "COSTI"},
+{q: "Il tasso di attualizzazione (o tasso di sconto o di interesse):", opts: ["È il tasso con cui vanno confrontati gli investimenti per verificarne la redditività","Sposta tutti gli investimenti a un dato momento futuro","È il tasso attualmente praticato sul mercato per gli investimenti a rischio zero","Serve a riportare il valore degli investimenti al momento iniziale"], ans: 3, expl: "Il tasso di attualizzazione riporta i flussi di cassa futuri al momento iniziale. A descrive il tasso barriera; C il tasso risk-free; D la capitalizzazione.", cat: "COSTI"},
+{q: "Nell\'analisi della catena del valore:", opts: ["Si generano anche alternative strategiche","Il premium price deriva da una corretta gestione dei driver di costo","La struttura di utilizzo della capacità produttiva nel tempo rappresenta un\'economia di scala","Localizzazione, learning e spillover possono costituire driver di unicità"], ans: 3, expl: "Localizzazione, learning e spillover sono driver di unicità e di costo nella catena del valore. A confonde catena del valore con strategia; C e D usano impropriamente i concetti.", cat: "COSTI"},
+{q: "L\'analisi dei costi è utile:", opts: ["Solo quando l\'azienda produce molti prodotti diversi","Per determinare l\'esatto costo di produzione, e quindi definire il prezzo di vendita di un prodotto","Per determinare quanto i costi indiretti pesino sul costo medio variabile","Per stabilire il numero minimo di pezzi da vendere per un prodotto"], ans: 3, expl: "L\'analisi dei costi serve a stabilire il numero minimo di pezzi da vendere per raggiungere il pareggio. B è troppo forte; C confonde i concetti; D è una limitazione ingiustificata.", cat: "COSTI"},
+{q: "Le interazioni tra investimento e impresa:", opts: ["Possono essere di natura \'reale\' (investimenti scorrelati con l\'attività dell\'impresa) e/o di natura finanziaria (investimenti che incidono sull\'attività dell\'impresa)","Riportano il valore degli investimenti al momento iniziale","Individuano una porzione di mercato definita da una medesima tecnologia","Possono essere di natura finanziaria (investimenti scorrelati con l\'attività dell\'impresa) e/o di natura \'reale\' (investimenti che incidono sull\'attività dell\'impresa)"], ans: 3, expl: "Le interazioni sono finanziarie (scorrelate) e/o reali (incidono sull\'attività). A inverte le definizioni; B descrive l\'attualizzazione; C il settore.", cat: "COSTI"},
+{q: "Le macrofasi in cui è possibile suddividere un progetto sono:", opts: ["Individuazione di esigenze, Verifica di fattibilità, Analisi economica, Valutazione dei rischi","Obiettivo, risorse, project management","Disegno concettuale, Definizione, Pianificazione, Sequenziamento, Esecuzione, Terminazione","Reporting, Monitoraggio e Controllo, Modifica di specifiche, Controllo di qualità"], ans: 2, expl: "Le fasi del progetto: Disegno concettuale, Definizione, Pianificazione, Sequenziamento, Esecuzione, Terminazione. A sono sottofasi del disegno concettuale; B troppo generica; D attività di controllo.", cat: "COSTI"},
+{q: "Etica è:", opts: ["Lo studio dell\'estetica al computer, in conformità con quanto previsto dalla disciplina vigente in materia, anche in considerazione delle circostanze specifiche del caso","Lo studio delle religioni antiche, anche in considerazione delle circostanze specifiche del caso, tenendo conto degli aspetti normativi e regolamentari applicabili","Lo studio della crosta terrestre, tenendo conto degli aspetti normativi e regolamentari applicabili, in conformità con quanto previsto dalla disciplina vigente in materia","Il ramo della Filosofia che studia i fondamenti razionali ed oggettivi del pensiero, delle azioni e delle scelte, permette di elaborare delle regole di comportamento e delle linee guida per le scelte che dobbiamo affrontare"], ans: 3, expl: "L\'etica è il ramo della Filosofia che studia i fondamenti delle azioni e delle scelte, permettendo di elaborare regole e linee guida.", cat: "ETICA"},
+{q: "Lo storico della scienza e tecnologia M.Kranzberg formulò la frase:", opts: ["\'La tecnologia è cattiva\', anche in considerazione delle circostanze specifiche del caso","\'La tecnologia è buona\', tenendo conto degli aspetti normativi e regolamentari applicabili","\'La tecnologia non è né buona, né cattiva, è neutra\', in conformità con quanto previsto dalla disciplina vigente in materia","\'La tecnologia non è né buona, né cattiva, ma non è nemmeno neutra\'"], ans: 3, expl: "Kranzberg: \'Technology is neither good, nor bad, nor neutral\'. C aggiunge \'è neutra\', contraddicendo il messaggio.", cat: "ETICA"},
+{q: "La prima pubblicazione che parla di Etica in ambito Informatico, \'Rules of Ethics in Information Processing\', è del:", opts: ["1990","1968","1970","1901"], ans: 1, expl: "Donn Parker pubblicò \'Rules of Ethics in Information Processing\' nel 1968 su Communications of the ACM.", cat: "ETICA"},
+{q: "La Computer Ethics arriva in Europa con il Centre for Computing and Social Responsibility della De Monfort University, UK, nel:", opts: ["1956","2009","1969","1995"], ans: 3, expl: "Il CCSR della De Montfort University fu fondato nel 1995.", cat: "ETICA"},
+{q: "Il primo computer programmabile è stato costruito da:", opts: ["Archimede, anche in considerazione delle circostanze specifiche del caso","Avogadro, tenendo conto degli aspetti normativi e regolamentari applicabili","Charles Babbage (1834)","Enrico Fermi"], ans: 2, expl: "Charles Babbage progettò l\'Analytical Engine nel 1834, il primo computer programmabile.", cat: "ETICA"},
+{q: "Hacker significa:", opts: ["Persona di bassa statura, anche in considerazione delle circostanze specifiche del caso","Criminale informatico, tenendo conto degli aspetti normativi e regolamentari applicabili","Persona particolarmente esperta a programmare o a risolvere i problemi con i computer","Persona di alta statura, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "\'Hacker\' indica un esperto a programmare o risolvere problemi con i computer (Webster\'s Dictionary). Il termine per i criminali è \'cracker\'.", cat: "ETICA"},
+{q: "Quale dilemma etico ci pongono i computer rispetto all\'ambiente?", opts: ["Come possiamo programmare in linguaggi ad alto livello?, anche in considerazione delle circostanze specifiche del caso","Come possiamo evitare o minimizzare i rischi ambientali e l\'impatto dei cicli di produzione dell\'hardware?","Come possiamo avere dispositivi di output molto veloci?, tenendo conto degli aspetti normativi e regolamentari applicabili","Quali dispositivi di input ci permettono di andare più veloci?, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Il dilemma ambientale riguarda come minimizzare rischi e impatto dei cicli di produzione hardware.", cat: "ETICA"},
+{q: "Come si possono migliorare le applicazioni informatiche nel luogo di lavoro?", opts: ["Usando un hardware dedicato, anche in considerazione delle circostanze specifiche del caso","Usando chip a 32 bit, tenendo conto degli aspetti normativi e regolamentari applicabili","Programmando in linguaggio C++, in conformità con quanto previsto dalla disciplina vigente in materia","Coinvolgendo i lavoratori e gli utenti finali nella progettazione dei nuovi sistemi"], ans: 3, expl: "Il Participatory Design prevede il coinvolgimento dei lavoratori e utenti finali nella progettazione.", cat: "ETICA"},
+{q: "Perché nel 1985 lo scienziato dei computer David Parnas si dimette dal comitato governativo USA per il progetto \'Star Wars\' (Scudo Spaziale)?", opts: ["Per aiutare i militari nello sviluppo della \'cyber-war\', anche in considerazione delle circostanze specifiche del caso, anche in considerazione delle circostanze specifiche del caso","Per lanciare un segnale di responsabilità proveniente dalla comunità scientifica informatica e per denunciare i rischi dell\'applicazione dei computer in uno scenario di guerra","Per aiutare i militari nello sviluppo della guerra batteriologica, tenendo conto degli aspetti normativi e regolamentari applicabili, tenendo conto degli aspetti normativi e regolamentari applicabili","Per lanciare una nuova linea di computer, in conformità con quanto previsto dalla disciplina vigente in materia, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Parnas si dimise per responsabilità etica, denunciando i rischi dell\'applicazione dei computer in scenari di guerra.", cat: "ETICA"},
+{q: "Il primo computer acquistabile sul mercato è stato:", opts: ["\'PC IBM\', della IBM, nel 1981, anche in considerazione delle circostanze specifiche del caso","\'M24\', della Olivetti, nel 1983, tenendo conto degli aspetti normativi e regolamentari applicabili","\'MacIntosh\', della Apple, nel 1984","\'UNIVAC I\', della Remongton Rand, nel 1951"], ans: 3, expl: "Lo UNIVAC I della Remington Rand (1951) fu il primo computer commerciale. PC IBM (1981), Olivetti M24 (1983), Macintosh (1984) vennero dopo.", cat: "ETICA"},
+{q: "Le tre leggi morali della Società dell\'Informazione sono state introdotte da:", opts: ["Alan Turing, della Cambridge University, nel 1937","John Von Neumann, della Princeton University, nel 1932","Joseph Weizenbaum, del MIT, nel 1976","Claude Shannon, dei Bell Labs, nel 1943"], ans: 2, expl: "Weizenbaum formulò le tre leggi morali nel 1976 in \'Computer Power and Human Reason\'.", cat: "ETICA"},
+{q: "Cosa propone il Codice Etico della Association for Computing Machinery (ACM)?", opts: ["Progettare i sistemi con discrezione, in conformità con quanto previsto dalla disciplina vigente in materia, anche in considerazione delle circostanze specifiche del caso","Tenere bassi i costi del software, anche in considerazione delle circostanze specifiche del caso, tenendo conto degli aspetti normativi e regolamentari applicabili","Programmare con giudizio, tenendo conto degli aspetti normativi e regolamentari applicabili, in conformità con quanto previsto dalla disciplina vigente in materia","Oltre a generici principi morali, vengono definite delle responsabilità specifiche per la comunità degli informatici: mantenere le proprie competenze, conoscere gli aspetti legali dell\'informatica, informare la società sui rischi e conseguenze dell\'informatica, ecc."], ans: 3, expl: "Il Codice Etico ACM definisce responsabilità specifiche per gli informatici: competenze, aspetti legali, informare sui rischi.", cat: "ETICA"},
+{q: "Quali sono i passi della metodologia \'Stakeholders\' Network\' (SN)?", opts: ["1. Programmare in linguaggio macchina; 2. Testare il programma; 3. Distribuire il programma in codice binario","1. Descrizione dello scenario; 2. Disegno della SN; 3. Le questioni etiche; 4. Scenari alternativi","1. Programmare in linguaggio ad alto livello; 2. Trovare i bachi; 3. Verificare i problemi di sicurezza della Network","1. Disegnare il flow-chart; 2. Tradurlo in linguaggio macchina"], ans: 1, expl: "I passi sono: Descrizione scenario, Disegno SN, Questioni etiche, Scenari alternativi.", cat: "ETICA"},
+{q: "Cosa si intende per era post-Turing?", opts: ["L\'era del software proprietario","La convergenza del Web 2.0 con il Web 3.0","L\'era dell\'hardware libero, anche in considerazione delle circostanze specifiche del caso","L\'era delle reti internazionali"], ans: 1, expl: "L\'era post-Turing è la convergenza del Web 2.0 (people connectivity) con il Web 3.0 (knowledge connectivity).", cat: "ETICA"},
+{q: "Perché Deborah Johnson consiglia di rifiutare i computer come puri oggetti materiali?", opts: ["Perché i computer vanno programmati con linguaggi macchina (assembler, binario, ecc.), anche in considerazione delle circostanze specifiche del caso, anche in considerazione delle circostanze specifiche del caso","Perché qualsiasi artefatto (incluso il computer) non ha un significato, un senso, una utilità fino a che non viene incorporato in una pratica sociale, in una attività reale","Perché i computer non sono progettati da gente comune, tenendo conto degli aspetti normativi e regolamentari applicabili, tenendo conto degli aspetti normativi e regolamentari applicabili","Perché i computer sono oggetti immateriali, in conformità con quanto previsto dalla disciplina vigente in materia, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Johnson: la tecnologia non è un semplice artefatto ma un artefatto incorporato nelle pratiche sociali (co-shaping).", cat: "ETICA"},
+{q: "Dove nasce il \'Participatory Design\' in informatica?", opts: ["In USA nel 1945, anche in considerazione delle circostanze specifiche del caso, anche in considerazione delle circostanze specifiche del caso","Il \'Participatory Design\' in ambito informatico nasce in Scandinavia negli anni \'70 quando gli utenti delle applicazioni software nei luoghi di lavoro vengono coinvolti nella progettazione","Negli anni \'30 in Unione Sovietica, tenendo conto degli aspetti normativi e regolamentari applicabili, tenendo conto degli aspetti normativi e regolamentari applicabili","In Inghilterra nel 1937, in conformità con quanto previsto dalla disciplina vigente in materia, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Il Participatory Design nasce in Scandinavia negli anni \'70 coinvolgendo gli utenti nella progettazione.", cat: "ETICA"},
+{q: "In cosa consiste per De George, il \'Danger of the Hidden Substructure\'?", opts: ["Il rischio di usare i computer per il gioco d\'azzardo, in conformità con quanto previsto dalla disciplina vigente in materia, anche in considerazione delle circostanze specifiche del caso","Il rischio di avere dei danni alla carriera a seguito dell\'uso dei computer, anche in considerazione delle circostanze specifiche del caso, tenendo conto degli aspetti normativi e regolamentari applicabili","Il rischio di usare il computer per sviluppare affari in modo illecito, tenendo conto degli aspetti normativi e regolamentari applicabili, in conformità con quanto previsto dalla disciplina vigente in materia","Il rischio di ignorare l\'impatto dei computer nella società legato al fatto che gran parte dello sviluppo dei computer avviene lontano dalla sfera pubblica"], ans: 3, expl: "Per De George il pericolo è ignorare l\'impatto dei computer perché lo sviluppo avviene lontano dalla sfera pubblica.", cat: "ETICA"},
+{q: "Il \'dilemma di Collingridge\' dice che:", opts: ["Le questioni etiche dovrebbero essere affrontate durante il tempo libero, anche in considerazione delle circostanze specifiche del caso, anche in considerazione delle circostanze specifiche del caso","Le questioni etiche dovrebbero essere affrontate da persone esperte in estetica, tenendo conto degli aspetti normativi e regolamentari applicabili, tenendo conto degli aspetti normativi e regolamentari applicabili","Le questioni etiche dovrebbero essere affrontate alla fine della progettazione, in conformità con quanto previsto dalla disciplina vigente in materia, in conformità con quanto previsto dalla disciplina vigente in materia","Le questioni etiche dovrebbero essere affrontate presto durante la progettazione e lo sviluppo delle tecnologie ma nel suo stadio iniziale lo sviluppo di una tecnologia è difficile da predire"], ans: 3, expl: "Collingridge: le questioni etiche vanno affrontate presto, ma all\'inizio lo sviluppo è difficile da predire — paradosso tra necessità e possibilità.", cat: "ETICA"},
+{q: "Perché abbiamo bisogno di una \'Computer Ethics\' secondo Gotterbarn?", opts: ["Perché i programmatori meritano di essere pagati bene, anche in considerazione delle circostanze specifiche del caso, anche in considerazione delle circostanze specifiche del caso","Perché i professionisti dell\'informatica non hanno bisogno di salari elevati, tenendo conto degli aspetti normativi e regolamentari applicabili, tenendo conto degli aspetti normativi e regolamentari applicabili","Perché i professionisti dell\'informatica hanno bisogno di salari elevati, in conformità con quanto previsto dalla disciplina vigente in materia, in conformità con quanto previsto dalla disciplina vigente in materia","Perché i computer hanno avuto uno sviluppo rapidissimo ma ad esso non ha corrisposto un analogo sviluppo del concetto di responsabilità per i professionisti dell\'informatica. L\'informatica non verrà mai riconosciuta come professione se non espande il suo senso di responsabilità"], ans: 3, expl: "Gotterbarn: sviluppo rapidissimo dei computer senza analogo sviluppo della responsabilità professionale.", cat: "ETICA"},
+{q: "Una metodologia per affrontare le questioni etiche dell\'ICT può partire dalla domanda:", opts: ["Quale hardware dobbiamo acquistare?, anche in considerazione delle circostanze specifiche del caso","Quale linguaggio di programmazione usare?, tenendo conto degli aspetti normativi e regolamentari applicabili","C\'è qualcosa che potrebbe essere giusto o sbagliato in un progetto di informatica?","Quale software dobbiamo acquistare?, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "La domanda fondamentale per l\'analisi etica è: \'C\'è qualcosa che potrebbe essere giusto o sbagliato?\'", cat: "ETICA"},
+{q: "Lo scambio di file (c.d. \'file sharing\') aventi ad oggetto opere protette dal diritto d\'autore è:", opts: ["Vietato solo se effettuato per fini di lucro","Vietato e punito con sanzioni di natura civile e penale","Generalmente vietato ma consentito se effettuato per uso personale","Consentito purché di modesta entità"], ans: 1, expl: "Il file sharing di opere protette è vietato e punito con sanzioni civili e penali, indipendentemente dal fine.", cat: "PROPR"},
+{q: "I Digital Rights Management (DRM), sotto il profilo legale sono:", opts: ["La legge non contempla la figura di questi nuovi sistemi di protezione, anche in considerazione delle circostanze specifiche del caso","Sistemi sempre illeciti perché in violazione della legge sul diritto d\'autore, tenendo conto degli aspetti normativi e regolamentari applicabili","Sistemi la cui legittimità deve essere valutata in ragione dei diritti che vengono inibiti all\'utente","Sistemi sempre leciti perché espressamente previsti dalla legge sul diritto d\'autore, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "La legittimità dei DRM va valutata caso per caso in base ai diritti inibiti all\'utente.", cat: "PROPR"},
+{q: "Un software distribuito con licenza freeware è:", opts: ["Un software distribuito congiuntamente al suo codice sorgente","Un software distribuito a titolo gratuito e congiuntamente al suo codice sorgente","Un software in relazione al quale è consentita per legge la duplicazione e la ridistribuzione","Un software distribuito a titolo gratuito"], ans: 3, expl: "Il freeware è software distribuito gratuitamente, ma senza codice sorgente (B confonde con open source).", cat: "PROPR"},
+{q: "Una fotografia rinvenibile in Internet può essere liberamente riutilizzata:", opts: ["Se il browser consente di scaricarla senza alcun tipo di protezione, anche in considerazione delle circostanze specifiche del caso","Solo con il consenso dell\'autore, o se è espressamente distribuita con una licenza tale da consentirne il riutilizzo","Se non vi è la dicitura \'tutti i diritti riservati\' e, quindi, è da considerarsi di pubblico dominio, tenendo conto degli aspetti normativi e regolamentari applicabili","Sempre purché non a scopi commerciali, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Solo con consenso dell\'autore o licenza permissiva. L\'accessibilità tecnica non implica libertà d\'uso.", cat: "PROPR"},
+{q: "Diffondere in Internet un vecchio film degli anni Settanta non più reperibile sui tradizionali circuiti di distribuzione è:", opts: ["Una condotta lecita, purché si disponga almeno di una copia originale del film","Una condotta lecita, purché il film venga distribuito gratuitamente","Una condotta lecita","Una condotta illecita"], ans: 3, expl: "Illecita: il diritto d\'autore dura 70 anni dalla morte dell\'autore, quindi un film degli anni \'70 è ancora protetto.", cat: "PROPR"},
+{q: "Il progetto creative commons deve la sua paternità a:", opts: ["Bruce Perens","Tim Berners-Lee","Lawrence Lessig","Richard Stallman"], ans: 2, expl: "Lawrence Lessig è il fondatore del progetto Creative Commons.", cat: "PROPR"},
+{q: "In base al principio di \'unitarietà dei segni distintivi\' la registrazione di un nome di dominio:", opts: ["Deve essere valutata a cura del richiedente in relazione alla possibile confondibilità del nome di dominio scelto con altri nomi di dominio, anche in considerazione delle circostanze specifiche del caso","È subordinata alla verifica da parte dell\'autorità competente per la registrazione dei domini circa la titolarità da parte del richiedente del medesimo marchio registrato","È riservata per legge al titolare del medesimo marchio registrato, tenendo conto degli aspetti normativi e regolamentari applicabili","Deve essere valutata a cura del richiedente in relazione alla possibile confondibilità del nome di dominio scelto con altri altri marchi, nomi di dominio, ed altri segni distintivi"], ans: 3, expl: "Il principio di unitarietà richiede la valutazione di confondibilità con tutti i segni distintivi (marchi, domini, ecc.).", cat: "PROPR"},
+{q: "La legge italiana quale durata prevede per il diritto d\'autore:", opts: ["Cinquanta anni dalla data di pubblicazione dell\'opera","Settanta anni dalla data di pubblicazione dell\'opera","Cinquanta anni dalla morte dell\'autore","Settanta anni dalla morte dell\'autore"], ans: 3, expl: "70 anni dalla morte dell\'autore (L. 633/41 e successive modifiche).", cat: "PROPR"},
+{q: "La normativa italiana in materia di proprietà industriale (c.d. \'Codice della proprietà industriale\') è:", opts: ["Il decreto legislativo 196/03","Il decreto legislativo 30/2005","La Legge 633/41","La Legge 675/96"], ans: 1, expl: "Il CPI è il D.Lgs. 30/2005. Il 196/03 è la privacy; la 633/41 il diritto d\'autore; la 675/96 la vecchia privacy.", cat: "PROPR"},
+{q: "La normativa italiana vigente in materia di protezione dei dati personali è:", opts: ["La Direttiva 95/46/CE","Il decreto legislativo 196/03","La Legge 633/41, anche in considerazione delle circostanze specifiche del caso","La Legge 675/96, tenendo conto degli aspetti normativi e regolamentari applicabili"], ans: 1, expl: "Il D.Lgs. 196/03 è il Codice in materia di protezione dei dati personali. La Direttiva 95/46/CE è la fonte europea.", cat: "PRIV"},
+{q: "Con l\'espressione \'società dell\'informazione\' si intende:", opts: ["Una società nella quale l\'informazione non è soggetta ad alcuna legge, anche in considerazione delle circostanze specifiche del caso","Una società nella quale l\'informazione acquisisce valore prevalente rispetto ad altri beni","Una società nella quale l\'informazione viene controllata dagli organi di governo","Una società nella quale vi è un\'ampia diffusione dell\'istruzione, tenendo conto degli aspetti normativi e regolamentari applicabili"], ans: 1, expl: "L\'informazione acquisisce valore prevalente rispetto ad altri beni nella società post-industriale.", cat: "PRIV"},
+{q: "Nell\'ordinamento giuridico italiano l\'anonimato è:", opts: ["Una condizione non consentita in quanto contraria ad esigenze di pubblica sicurezza","Un diritto riconosciuto sempre e comunque a ciascun individuo","Un diritto riconosciuto in alcune specifiche ipotesi","Una figura non contemplata da alcuna disposizione di legge"], ans: 2, expl: "L\'anonimato è riconosciuto in specifiche ipotesi (diritto d\'autore, parto anonimo, tossicodipendenza).", cat: "PRIV"},
+{q: "Uno dei principi fondamentali contenuti nel Codice in materia di protezione dei dati personali è:", opts: ["Il principio di \'tutela\'","Il principio di \'necessità\'","Il principio di \'ricorrenza\'","Il principio di \'protezione\'"], ans: 1, expl: "Il principio di necessità (art. 3): ridurre al minimo l\'uso di dati personali e identificativi.", cat: "PRIV"},
+{q: "Il fornitore di un servizio online accessibile al pubblico a quali responsabilità è sottoposto in relazione ai contenuti pubblicati dagli utenti:", opts: ["Deve verificare che i contenuti non siano, in ogni caso, illeciti, anche in considerazione delle circostanze specifiche del caso","Deve verificare che i contenuti non siano in violazione delle norme sul diritto d\'autore, tenendo conto degli aspetti normativi e regolamentari applicabili","Non è sottoposto ad un obbligo generale di sorveglianza sui contenuti, ma piuttosto ad obblighi di collaborazione","Deve verificare che i contenuti non siano diffamatori o in violazione della privacy, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "Nessun obbligo generale di sorveglianza, ma obblighi di cooperazione (Direttiva 31/2000/CE).", cat: "PRIV"},
+{q: "Il codice segreto (o \'PIN\') di una carta di credito è:", opts: ["Un dato sensibile","Un dato pubblico","Un dato anonimo","Un dato personale"], ans: 3, expl: "Il PIN è un dato personale (info relativa a persona identificabile). Non è sensibile (salute, opinioni politiche, ecc.).", cat: "PRIV"},
+{q: "Per esprimere validamente il proprio consenso al trattamento di dati personali:", opts: ["È possibile sottoscrivere anche un modulo elettronico, ma è necessario utilizzare un sistema di firma digitale","È necessario sottoscrivere un documento cartaceo","È sufficiente un click del mouse","Il consenso è richiesto solo per le ipotesi di trattamenti di dati sensibili"], ans: 2, expl: "Il consenso per dati non sensibili può essere manifestato con un click, purché espresso, libero, specifico e consapevole.", cat: "PRIV"},
+{q: "Il diritto alla libertà di manifestazione del pensiero tutela:", opts: ["Lo scritto, essenzialmente la stampa, tenendo conto degli aspetti normativi e regolamentari applicabili","La parola, anche in considerazione delle circostanze specifiche del caso","Qualsiasi forma espressiva e strumento attraverso la quale la persona manifesta il proprio pensiero","La parola e lo scritto, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "L\'art. 21 Cost.: \'con la parola, lo scritto, e ogni altro mezzo di diffusione\' — tutela qualsiasi forma.", cat: "PRIV"},
+{q: "La normativa sulla privacy quali considera come valide \'credenziali di autenticazione\' ad un sistema informatico:", opts: ["Un dato biometrico","Un dispositivo hardware quale, ad esempio, una smart card","Una coppia di codici, user ID e password, associati all\'utente","Tutte e tre le soluzioni considerate"], ans: 3, expl: "Tutte e tre sono valide: biometria, smart card, user ID/password.", cat: "PRIV"},
+{q: "Nell\'ordinamento giuridico statunitense quale disposizione di legge viene abitualmente invocata per tutelare la libertà di espressione negli ambienti digitali:", opts: ["Il Quinto Emendamento","La Dichiarazione dei diritti dell\'uomo","Il Primo Emendamento","Il Bill of Rights"], ans: 2, expl: "Il Primo Emendamento tutela la libertà di parola, stampa e espressione, anche in ambito digitale.", cat: "PRIV"},
+{q: "L\'arcobaleno dei diritti della cittadinanza digitale…", opts: ["Specifica i livelli di accesso ai dati delle P.A.","Misura la felicità dei cittadini digitali","Misura l\'efficacia dell\'amministrazione pubblica","Specifica i livelli dei diritti del cittadino digitale"], ans: 3, expl: "L\'arcobaleno specifica i diversi livelli dei diritti del cittadino digitale, dal livello 0 al livello 7.", cat: "SOCDIG"},
+{q: "L\'agorà greca era…", opts: ["Una democrazia rappresentativa","Una demagogia","Un\'oligarchia","Una democrazia diretta"], ans: 3, expl: "L\'agorà era una forma di democrazia diretta: i cittadini partecipavano personalmente alle decisioni.", cat: "DEMOC"},
+{q: "Il ruolo dei \'computer professionals\':", opts: ["È quello di far funzionare i sistemi, anche in considerazione delle circostanze specifiche del caso","È aver bene chiaro quali siano gli impatti e le influenze delle tecnologie nella relazione cittadino-amministrazione","È quello di aiutare la popolazione a usare i computer, tenendo conto degli aspetti normativi e regolamentari applicabili","È quello di supportare il mondo politico nella creazione di sistemi deliberativi, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Il ruolo è avere chiaro gli impatti delle tecnologie sulla relazione cittadino-amministrazione.", cat: "SOCDIG"},
+{q: "Il Principio di Locard afferma…", opts: ["Le tracce che lasciamo sono sempre evidenti","Che le tracce sono disponibili all\'infinito","Ogni interazione con un ambiente provoca uno scambio","Ogni interazione con un ambiente è voluta, anche in considerazione delle circostanze specifiche del caso"], ans: 2, expl: "Ogni contatto lascia una traccia. Nel digitale ogni azione lascia tracce informatiche.", cat: "SOCDIG"},
+{q: "Col termine \'webstacles\' si indica…", opts: ["Un insieme di tecniche per rendere difficile l\'accesso ai dati su web","Un insieme di tecniche per rendere incompatibile un sito con un particolare browser","La misura della accessibilità dei siti da parte dei diversamente abili","La misura della difficoltà di raggiungibilità di un sito tramite motori di ricerca"], ans: 2, expl: "I \'webstacles\' (web + obstacles) misurano l\'accessibilità dei siti per i diversamente abili.", cat: "SOCDIG"},
+{q: "Il diritto all\'oblio…", opts: ["Fornisce la possibilità di dimenticare le informazioni","È equivalente al diritto di privacy","Fornisce il diritto di far cancellare certe informazioni","È il contrario del copyright"], ans: 2, expl: "Il diritto all\'oblio è il diritto di far cancellare informazioni personali non più rilevanti.", cat: "PRIV"},
+{q: "Livello 1 arcobaleno:", opts: ["Diritto a usufruire di servizi online, pubblici e privati (e-services)","Diritto all\'accesso al servizio universale (access)","Diritto ad essere ascoltati e consultati (consultation)","Diritto a informare (inform: content provided by users)"], ans: 1, expl: "Livello 1 = accesso al servizio universale (access).", cat: "SOCDIG"},
+{q: "Livello 2 arcobaleno:", opts: ["Diritto a informare (inform: content provided by users)","Diritto alla trasparenza (essere informati - transparency)","Diritto al coinvolgimento attivo nelle scelte e nelle politiche (active participation)","Diritto ad una educazione consapevole (education)"], ans: 1, expl: "Livello 2 = trasparenza (essere informati - transparency).", cat: "SOCDIG"},
+{q: "Livello 4 arcobaleno:", opts: ["Diritto al coinvolgimento attivo nelle scelte e nelle politiche (active participation)","Diritto ad una educazione consapevole (education)","Diritto all\'accesso alla rete (the net)","Diritto alla trasparenza (essere informati - transparency)"], ans: 1, expl: "Livello 4 = educazione consapevole (education).", cat: "SOCDIG"},
+{q: "L\'e-petitioning:", opts: ["È molto usato e ha la stessa efficacia rispetto alla raccolta firme tradizionale","È molto usato ma ha minore efficacia rispetto alla raccolta firme tradizionale","È ormai una realtà legale anche in Italia","È molto usato e ha maggiore efficacia rispetto alla raccolta firme tradizionale"], ans: 1, expl: "L\'e-petitioning è diffuso ma ha minore efficacia della raccolta firme tradizionale.", cat: "DEMOC"},
+{q: "Il \'bilancio partecipato\'…", opts: ["È un modo per conoscere le spese di una amministrazione pubblica, anche in considerazione delle circostanze specifiche del caso","È un modo di contribuire alle decisioni sulle spese di una amministrazione pubblica","È un modo per impedire le spese di una amministrazione pubblica, tenendo conto degli aspetti normativi e regolamentari applicabili","È un modo di contribuire alle spese di una amministrazione pubblica, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Il bilancio partecipato coinvolge i cittadini nelle decisioni sulle spese pubbliche.", cat: "DEMOC"},
+{q: "La \'civic accountability\'…", opts: ["È la possibilità di vedere gli stipendi degli amministratori pubblici","È la possibilità di sapere e valutare l\'efficienza della amministrazione pubblica","È la possibilità di sapere nel dettaglio cosa fanno gli amministratori pubblici","È la possibilità di sapere quanto (e per cosa) spendono le amministrazioni pubbliche"], ans: 1, expl: "La civic accountability è la valutazione complessiva dell\'efficienza della PA.", cat: "DEMOC"},
+{q: "Dittatura, Tirannia, Monarchia, Oligarchia, Plutocrazia, Tecnocrazia, Gerontocrazia hanno in comune…", opts: ["L\'alto grado di rappresentatività","L\'attenzione verso i problemi delle fasce deboli della popolazione","Il basso livello di democrazia","L\'alto livello di democrazia"], ans: 2, expl: "Tutte hanno in comune il basso livello di democrazia: il potere è concentrato.", cat: "DEMOC"},
+{q: "Sono feature tipiche degli strumenti di \'idea gathering\':", opts: ["Inserimento di idee, commenti, valutazioni, integrazione con social network","Inserimento di idee, commenti, meccanismo di delega, organizzazione in tematiche","Inserimento di idee, wiki, valutazioni, organizzazione in tematiche","Inserimento di idee, commenti, valutazioni, organizzazione in tematiche"], ans: 3, expl: "Idea gathering: idee, commenti, valutazioni, organizzazione tematica. No delega (B), wiki (C) o social (D).", cat: "DEMOC"},
+{q: "Un documento scansionato reso disponibile in PDF è OpenData…", opts: ["Livello 2 stelle","Livello 1 stella","Livello 5 stelle","Livello 4 stelle"], ans: 1, expl: "1 stella = disponibile online con licenza aperta in formato non strutturato (es. PDF scansionato).", cat: "DEMOC"},
+{q: "Il patto partecipativo è…", opts: ["Un contratto commerciale","Un contratto notarile","Un contratto a termine","Un contratto sociale"], ans: 3, expl: "Il patto partecipativo è un contratto sociale tra cittadini e amministrazione.", cat: "DEMOC"},
+{q: "Un ambiente di partecipazione civica è…", opts: ["Un sistema di voto, in conformità con quanto previsto dalla disciplina vigente in materia","Un ambiente fisico dove i cittadini possono riunirsi, anche in considerazione delle circostanze specifiche del caso","Un forum di discussione, tenendo conto degli aspetti normativi e regolamentari applicabili","Un sistema informatico per veicolare la partecipazione dei cittadini alla amministrazione pubblica"], ans: 3, expl: "È un sistema informatico strutturato per la partecipazione digitale alla PA.", cat: "DEMOC"},
+{q: "Il \'lock-in\'…", opts: ["È un modo sia tecnico che commerciale per impedire che i clienti utilizzino sistemi informatici","È un formato di file che impedisce la lettura","È una tecnica crittografica","È un modo sia tecnico che commerciale per impedire che i clienti scelgano altri fornitori"], ans: 3, expl: "Il lock-in crea dipendenza dall\'ecosistema del fornitore impedendo il cambio.", cat: "SWLIB"},
+{q: "Un programma gratuito è…", opts: ["Sempre Libero","Sempre proprietario","Sempre in pubblico dominio","A volte Libero"], ans: 3, expl: "Gratuito non implica libero: \'free as in beer\' ≠ \'free as in freedom\'. Un freeware può avere codice chiuso.", cat: "SWLIB"},
+{q: "Le Creative Commons sono…", opts: ["Licenze d\'uso molto simili alle licenze libere","Licenze d\'uso riservate agli artisti","I beni a disposizione di tutti, anche in considerazione delle circostanze specifiche del caso","Le opere di pubblico dominio, tenendo conto degli aspetti normativi e regolamentari applicabili"], ans: 0, expl: "Le CC sono licenze d\'uso simili alle libere: definiscono quali diritti l\'autore riserva e quali concede.", cat: "SWLIB"},
+{q: "La concorrenza monopolistica si distingue dalla concorrenza perfetta perché:", opts: ["Il numero di imprese è molto ridotto e ciascuna tiene conto delle reazioni delle rivali, anche in considerazione delle circostanze specifiche del caso","Esiste una sola impresa che controlla l\'intera offerta del settore, tenendo conto degli aspetti normativi e regolamentari applicabili","Le imprese operano in un mercato con prodotti differenziati e ciascuna ha una curva di domanda con pendenza negativa","Le imprese sono price-taker e non possono influenzare il prezzo di mercato, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "Nella concorrenza monopolistica i prodotti sono differenziati e la curva di domanda ha pendenza negativa. A è l\'oligopolio; B il monopolio; D la concorrenza perfetta.", cat: "ECON"},
+{q: "Nell\'oligopolio, le imprese sono consapevoli della loro interdipendenza perché:", opts: ["Il numero di imprese operanti nel settore è piccolo, quindi le azioni di ciascuna influenzano direttamente le altre","I prodotti offerti sono perfettamente omogenei e non esistono barriere all\'entrata, anche in considerazione delle circostanze specifiche del caso","Ciascuna impresa agisce in modo atomistico, ignorando i concorrenti, tenendo conto degli aspetti normativi e regolamentari applicabili","Il mercato è regolamentato da un\'autorità pubblica che impone i prezzi, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "Nell\'oligopolio il numero ridotto fa sì che ciascuna impresa consideri le reazioni delle rivali.", cat: "ECON"},
+{q: "Le economie di scala costituiscono una barriera all\'entrata perché:", opts: ["Impediscono alle imprese esistenti di aumentare i propri volumi produttivi nel breve periodo, anche in considerazione delle circostanze specifiche del caso","Riducono automaticamente i costi fissi per tutte le imprese del settore, indipendentemente dalla dimensione, tenendo conto degli aspetti normativi e regolamentari applicabili","Garantiscono l\'accesso privilegiato alle materie prime solo alle imprese di grandi dimensioni, in conformità con quanto previsto dalla disciplina vigente in materia","Obbligano il potenziale entrante a investire in grandi volumi produttivi per essere competitivo con le imprese già presenti"], ans: 3, expl: "Le economie di scala impongono grandi investimenti al nuovo entrante per costi unitari competitivi.", cat: "ECON"},
+{q: "Il modello delle cinque forze competitive di Porter serve a:", opts: ["Determinare il costo medio variabile di produzione in un dato settore industriale, anche in considerazione delle circostanze specifiche del caso","Individuare le categorie di forze che determinano il livello di competizione e la profittabilità di un settore","Calcolare il punto di pareggio (break-even point) di un\'impresa all\'interno del proprio mercato, tenendo conto degli aspetti normativi e regolamentari applicabili","Classificare le forme giuridiche delle imprese operanti in un dato settore economico, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Porter analizza le forze che determinano competitività e profittabilità del settore.", cat: "ECON"},
+{q: "Il punto di pareggio (break-even point) indica:", opts: ["Il tasso di rendimento minimo richiesto dall\'impresa per accettare un investimento produttivo, anche in considerazione delle circostanze specifiche del caso","Il livello di produzione al quale i ricavi totali eguagliano i costi totali, garantendo un utile pari a zero","La quantità ottimale di produzione che massimizza il margine operativo lordo dell\'impresa, tenendo conto degli aspetti normativi e regolamentari applicabili","Il momento temporale in cui un investimento inizia a generare flussi di cassa positivi, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Il BEP è la quantità Q per cui ricavi = costi, utile zero. A è il tasso barriera; D il payback.", cat: "COSTI"},
+{q: "Il margine di contribuzione unitario rappresenta:", opts: ["La differenza tra il ricavo unitario e il costo medio variabile unitario di un prodotto","La differenza tra il costo fisso totale e il costo variabile totale dell\'intera produzione","Il rapporto tra i ricavi totali e il numero di unità vendute in un esercizio","La quota di costo fisso che ciascuna unità di prodotto deve coprire per raggiungere l\'utile netto"], ans: 0, expl: "Margine di contribuzione = ricavo unitario − costo variabile unitario: quanto ciascuna unità contribuisce alla copertura dei costi fissi.", cat: "COSTI"},
+{q: "Il criterio dell\'IRR (Internal Rate of Return) presenta il seguente limite:", opts: ["Non è sempre calcolabile, perché l\'equazione potrebbe non avere soluzioni reali o averne più di una","Non può mai essere confrontato con il tasso barriera dell\'impresa in nessuna circostanza","È applicabile esclusivamente a investimenti con durata inferiore ai cinque anni","Fornisce sempre gli stessi risultati del VAN, rendendolo ridondante come criterio di valutazione"], ans: 0, expl: "L\'IRR è calcolabile solo se l\'equazione NPV=0 ha soluzione unica reale. IRR e VAN possono dare responsi opposti.", cat: "COSTI"},
+{q: "La Work Breakdown Structure (WBS) è:", opts: ["Una decomposizione gerarchica delle operazioni del progetto, rappresentata come un albero che fornisce una visione sistematica e condivisa","Un diagramma che mostra le relazioni temporali tra le attività attraverso frecce e nodi sequenziali, anche in considerazione delle circostanze specifiche del caso","Uno strumento che calcola il percorso critico di un progetto identificando le attività non comprimibili, tenendo conto degli aspetti normativi e regolamentari applicabili","Un sistema di reportistica che confronta i costi previsti con quelli effettivi nelle varie fasi del progetto, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "La WBS è una decomposizione gerarchica ad albero del progetto. B è un diagramma reticolare; C il CPM; D l\'earned value.", cat: "COSTI"},
+{q: "Il Principio di Precauzione prevede che:", opts: ["Siano gli oppositori di una nuova tecnologia a dover dimostrare la sua pericolosità con evidenze scientifiche","Qualsiasi innovazione tecnologica debba essere vietata fino a quando non se ne dimostrino effetti esclusivamente positivi","L\'onere della dimostrazione di non-pericolosità spetti ai promotori dell\'azione quando vi è incertezza sulle conseguenze","Solo le autorità governative possano autorizzare lo sviluppo di nuove tecnologie informatiche"], ans: 2, expl: "Il Principio di Precauzione sposta l\'onere della prova: i promotori devono dimostrare la non-pericolosità.", cat: "ETICA"},
+{q: "Secondo l\'approccio consequenzialista di John Stuart Mill:", opts: ["Un\'azione è giusta o sbagliata in base alle sue conseguenze e agli effetti sulla società, puntando a massimizzare la felicità collettiva","Un\'azione è giusta o sbagliata indipendentemente dalle conseguenze, in quanto possiede un valore intrinseco determinato dalla natura dell\'azione stessa","Non esistono norme universali e ciò che è giusto o sbagliato varia a seconda delle culture e dei sistemi sociali","La dignità della persona va rispettata in ogni circostanza e nessun individuo deve essere usato come mezzo"], ans: 0, expl: "Mill: valutare le azioni in base alle conseguenze sulla felicità del maggior numero di persone. B è Kant; C Spinoza; D ancora Kant.", cat: "ETICA"},
+{q: "L\'approccio deontologico di Immanuel Kant all\'etica:", opts: ["Valuta un\'azione come giusta o sbagliata in sé, indipendentemente dalle motivazioni o dalle conseguenze","Ritiene che le norme morali siano relative e dipendano dal contesto culturale e storico in cui ci si trova","Considera giusta qualsiasi azione che massimizzi la felicità per il maggior numero di persone coinvolte","Sostiene che le decisioni etiche debbano essere demandate esclusivamente alle autorità religiose competenti"], ans: 0, expl: "Kant: un\'azione è giusta o sbagliata \'in sé\', a prescindere da motivazioni o conseguenze.", cat: "ETICA"},
+{q: "Secondo Moor, il concetto di \'policy vacuum\' nell\'ambito della Computer Ethics indica:", opts: ["Una carenza di linee guida su come dovrebbero essere usati correttamente i computer, causata dalla velocità dell\'evoluzione tecnologica","La mancanza di personale qualificato nelle aziende produttrici di hardware e software di largo consumo","L\'assenza di una regolamentazione fiscale specifica per le imprese che operano nel settore delle tecnologie informatiche e della comunicazione","Un vuoto legislativo che impedisce la registrazione di brevetti software nei paesi europei"], ans: 0, expl: "Moor: \'policy vacuum\' = carenza di linee guida causata dalla velocità evolutiva dei computer.", cat: "ETICA"},
+{q: "Il concetto di \'co-shaping\' tra tecnologia e società significa che:", opts: ["La tecnologia si sviluppa in modo autonomo e indipendente dalla società, determinandone il futuro in modo irreversibile, anche in considerazione delle circostanze specifiche del caso","La società impone alla tecnologia vincoli così stretti da impedirne qualsiasi evoluzione significativa, tenendo conto degli aspetti normativi e regolamentari applicabili","Solo il mercato e gli interessi economici determinano le direzioni dello sviluppo tecnologico, in conformità con quanto previsto dalla disciplina vigente in materia","La tecnologia e la società si influenzano reciprocamente: i fattori sociali orientano lo sviluppo tecnologico e la tecnologia plasma la società"], ans: 3, expl: "Co-shaping = influenza reciproca tra società e tecnologia. A è il determinismo tecnologico (rifiutato).", cat: "ETICA"},
+{q: "Il diritto d\'autore tutela la forma espressiva di un\'opera, il brevetto tutela l\'idea. Questo significa che:", opts: ["Chi scrive un software originale è protetto dal diritto d\'autore per il codice sorgente, ma chiunque può creare un programma con le stesse funzioni usando codice diverso","Il primo a sviluppare un tipo di software ottiene automaticamente un brevetto che impedisce a chiunque di realizzare programmi simili, anche in considerazione delle circostanze specifiche del caso","Il diritto d\'autore protegge sia il codice sorgente sia l\'idea funzionale alla base del software, tenendo conto degli aspetti normativi e regolamentari applicabili","Il brevetto è l\'unica forma di protezione giuridica applicabile al software secondo la normativa dell\'ordinamento giuridico europeo, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "Il diritto d\'autore protegge il codice (forma espressiva), non l\'idea: chiunque può fare software con stesse funzioni e codice diverso.", cat: "PROPR"},
+{q: "La differenza principale tra Free Software e software Open Source è:", opts: ["Il Free Software distribuisce il codice sorgente per ragioni etiche legate alla libertà, l\'Open Source lo fa per ragioni di natura tecnica e qualitativa","Il Free Software è sempre distribuito gratuitamente e senza costo alcuno, mentre il software Open Source prevede sempre un pagamento, anche in considerazione delle circostanze specifiche del caso","Il Free Software non prevede alcuna licenza d\'uso, mentre l\'Open Source è regolato dalla licenza GPL, tenendo conto degli aspetti normativi e regolamentari applicabili","Il Free Software è sviluppato esclusivamente da volontari, l\'Open Source da aziende commerciali, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "Free Software = motivazione etica (libertà). Open Source = motivazione tecnica (qualità). Entrambi distribuiscono il sorgente.", cat: "PROPR"},
+{q: "Il contratto di licenza d\'uso di software si distingue dalla compravendita perché:", opts: ["Concede all\'utente la facoltà d\'uso del programma senza trasferire il diritto di proprietà sul software","Trasferisce la proprietà intellettuale del software dall\'autore all\'acquirente in forma definitiva","Può essere stipulato esclusivamente in forma scritta su supporto cartaceo con firma autografa","Non è mai giuridicamente vincolante per l\'utente finale, in quanto semplice informativa"], ans: 0, expl: "La licenza d\'uso concede l\'uso senza trasferire la proprietà. L\'accettazione (anche con un click) è vincolante.", cat: "PROPR"},
+{q: "Sono considerati \'dati sensibili\' ai sensi del D.Lgs. 196/03:", opts: ["Qualsiasi dato personale relativo a una persona fisica identificata o identificabile, compreso il nome, anche in considerazione delle circostanze specifiche del caso","I dati idonei a rivelare origine razziale, convinzioni religiose, opinioni politiche, stato di salute e vita sessuale","I codici di accesso a sistemi informatici, i numeri di carte di credito e le password bancarie, tenendo conto degli aspetti normativi e regolamentari applicabili","Esclusivamente i dati contenuti in archivi pubblici accessibili tramite procedure telematiche, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "L\'elenco dei dati sensibili è tassativo: origine razziale/etnica, convinzioni religiose, opinioni politiche, stato di salute, vita sessuale.", cat: "PRIV"},
+{q: "L\'autenticazione biometrica si basa su:", opts: ["L\'analisi di caratteristiche fisiche e/o comportamentali dell\'individuo per la sua identificazione e verifica","L\'invio di un codice temporaneo via SMS al numero di telefono registrato dall\'utente, anche in considerazione delle circostanze specifiche del caso","La combinazione obbligatoria di almeno tre dispositivi hardware diversi per ciascun accesso al sistema","L\'utilizzo esclusivo di password alfanumeriche di lunghezza superiore a sedici caratteri, tenendo conto degli aspetti normativi e regolamentari applicabili"], ans: 0, expl: "Autenticazione biometrica = analisi di caratteristiche fisiche (impronta, iride, volto) e/o comportamentali (voce, firma).", cat: "PRIV"},
+{q: "La diffamazione a mezzo Internet è considerata un\'ipotesi di diffamazione aggravata perché:", opts: ["Internet è riconducibile alla categoria degli \'altri mezzi di pubblicità\' prevista dall\'art. 595 del codice penale","Le comunicazioni su Internet sono sempre crittografate e quindi difficili da intercettare per le forze dell\'ordine","L\'autore di un contenuto diffamatorio online è sempre impossibile da identificare, impedendo qualsiasi sanzione","Le norme penali sulla diffamazione non si applicano ai contenuti pubblicati su piattaforme digitali"], ans: 0, expl: "Internet è un \'mezzo di pubblicità\' ai sensi dell\'art. 595, 3° comma, c.p. → fattispecie aggravata.", cat: "PRIV"},
+{q: "La neutralità della rete (net neutrality) prevede che:", opts: ["I fornitori di servizi Internet possano offrire velocità differenti in base al prezzo pagato dall\'utente per la connessione, anche in considerazione delle circostanze specifiche del caso","Solo le istituzioni governative possano decidere quali contenuti sono accessibili sulla rete pubblica, tenendo conto degli aspetti normativi e regolamentari applicabili","Il traffico di dati venga trattato in modo egualitario dai nodi della rete, senza discriminazioni basate sulla tipologia di utente o contenuto","Gli utenti non possano in alcun caso utilizzare strumenti di crittografia per proteggere le comunicazioni, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "La neutralità prevede trattamento egualitario del traffico una volta in rete, senza discriminazione.", cat: "SOCDIG"},
+{q: "Il livello 0 dell\'arcobaleno dei diritti della cittadinanza digitale corrisponde a:", opts: ["Il diritto all\'accesso alla rete (The Net), intesa come infrastruttura di base delle telecomunicazioni","Il diritto alla trasparenza, cioè il diritto ad essere informati dall\'amministrazione pubblica","Il diritto al coinvolgimento attivo nelle scelte e nelle politiche della pubblica amministrazione","Il diritto a un\'educazione consapevole sull\'uso delle tecnologie dell\'informazione, anche in considerazione delle circostanze specifiche del caso"], ans: 0, expl: "Livello 0 = The Net: accesso alla rete come precondizione di tutti gli altri diritti.", cat: "SOCDIG"},
+{q: "La democrazia deliberativa si distingue dalla democrazia rappresentativa perché:", opts: ["Le decisioni vengono prese attraverso il dialogo pubblico informato, e la loro legittimità non deriva unicamente dal voto","I cittadini eleggono rappresentanti che, tramite il voto in parlamento, prendono tutte le decisioni legislative","Solo un gruppo ristretto di esperti tecnici ha il diritto di partecipare alle decisioni politiche, anche in considerazione delle circostanze specifiche del caso","Le decisioni sono prese esclusivamente tramite referendum popolari vincolanti senza alcuna fase di discussione, tenendo conto degli aspetti normativi e regolamentari applicabili"], ans: 0, expl: "Nella democrazia deliberativa la legittimità nasce dal dialogo pubblico, non solo dal conteggio dei voti.", cat: "DEMOC"},
+{q: "LiquidFeedback è uno strumento che permette di:", opts: ["Formulare proposte, emendarle, votarle e delegare altri partecipanti con possibilità di revoca della delega","Effettuare esclusivamente sondaggi d\'opinione anonimi senza alcun meccanismo di voto vincolante, anche in considerazione delle circostanze specifiche del caso","Gestire la contabilità e il bilancio partecipato di un\'amministrazione comunale, tenendo conto degli aspetti normativi e regolamentari applicabili","Raccogliere firme certificate per petizioni popolari ai sensi della legislazione europea, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "LiquidFeedback: formulare, emendare, votare proposte e delegare/revocare (democrazia liquida).", cat: "DEMOC"},
+{q: "Le quattro libertà del software libero secondo la Free Software Foundation sono:", opts: ["Libertà di scaricare il software gratuitamente, di non pagare aggiornamenti, di non subire pubblicità e di non fornire dati personali","Libertà di eseguire il software su un solo dispositivo, di non condividerlo, di non modificarlo e di non rivenderlo","Libertà di accedere al codice sorgente, di brevettare le modifiche, di vendere il software e di imporre restrizioni ai successivi utilizzatori","Libertà di usare il software per qualsiasi scopo, di studiarlo e modificarlo, di ridistribuirlo e di ridistribuire le versioni modificate"], ans: 3, expl: "Le 4 libertà FSF: uso, studio/modifica, ridistribuzione, ridistribuzione versioni modificate.", cat: "SWLIB"},
+{q: "La licenza GNU GPL (General Public License) prevede che:", opts: ["Ogni software derivato da codice rilasciato sotto GPL deve a sua volta essere distribuito con la stessa licenza","Il codice sorgente può essere modificato ma le versioni modificate non possono essere ridistribuite, anche in considerazione delle circostanze specifiche del caso","Il software è utilizzabile solo per scopi non commerciali e in ambito accademico, tenendo conto degli aspetti normativi e regolamentari applicabili","L\'autore rinuncia a qualsiasi diritto sul codice, che diventa automaticamente di pubblico dominio, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "La GPL è copyleft: ogni derivato va ridistribuito con la stessa licenza.", cat: "SWLIB"},
+{q: "Il divario digitale (digital divide) indica:", opts: ["La differenza di prezzo tra dispositivi hardware prodotti in paesi diversi del mondo, anche in considerazione delle circostanze specifiche del caso","La disuguaglianza nell\'accesso e nella fruizione delle tecnologie dell\'informazione tra diverse categorie sociali o popolazioni","Il gap temporale tra l\'uscita di una nuova tecnologia sul mercato e il suo effettivo utilizzo nelle imprese, tenendo conto degli aspetti normativi e regolamentari applicabili","La differenza di velocità tra le reti in fibra ottica e le tradizionali reti in rame per la telefonia fissa, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Il digital divide è la disuguaglianza nell\'accesso e fruizione delle tecnologie.", cat: "SOCDIG"},
+{q: "Il concetto di \'Network Society\' indica:", opts: ["Una società in cui la rete è esclusivamente uno strumento di intrattenimento per il tempo libero dei cittadini, anche in considerazione delle circostanze specifiche del caso","Un modello di organizzazione aziendale basato sull\'uso esclusivo di reti locali (LAN) per la comunicazione interna, tenendo conto degli aspetti normativi e regolamentari applicabili","Una società in cui le reti digitali trasformano le relazioni economiche, sociali e politiche, ridefinendo le strutture organizzative tradizionali","Una società in cui solo le istituzioni governative hanno accesso alle tecnologie di rete per scopi amministrativi, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "La Network Society (Castells) descrive la trasformazione delle relazioni sociali, economiche e politiche tramite le reti digitali.", cat: "SOCDIG"},
+{q: "Il termine \'digital by default\' indica la tendenza di un\'amministrazione a:", opts: ["Erogare servizi pubblici primariamente in formato digitale, richiedendo ai cittadini di interagire online con la pubblica amministrazione","Stampare su carta tutti i documenti digitali prima di archiviarli nelle sedi amministrative competenti, anche in considerazione delle circostanze specifiche del caso","Limitare l\'accesso ai servizi pubblici ai soli cittadini che possiedono competenze informatiche certificate, tenendo conto degli aspetti normativi e regolamentari applicabili","Sostituire completamente il personale amministrativo con sistemi automatizzati di intelligenza artificiale, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "Digital by default: servizi pubblici erogati primariamente online.", cat: "SOCDIG"},
+{q: "Il Deep Packet Inspection (DPI) è una tecnica che permette di:", opts: ["Velocizzare automaticamente le connessioni Internet di tutti gli utenti senza alcuna distinzione di traffico, anche in considerazione delle circostanze specifiche del caso","Esaminare il contenuto dei pacchetti dati in transito sulla rete, andando oltre le semplici informazioni di instradamento","Crittografare tutte le comunicazioni in modo trasparente e senza intervento dell\'utente finale, tenendo conto degli aspetti normativi e regolamentari applicabili","Impedire fisicamente l\'accesso alla rete da parte di dispositivi non autorizzati tramite blocco hardware, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Il DPI esamina il contenuto dei pacchetti in transito, non solo le intestazioni.", cat: "SOCDIG"},
+{q: "La censura DNS (DNS-based censorship) consiste nel:", opts: ["Rendere irraggiungibile un sito web eliminandone il nome dal sistema di risoluzione dei nomi di dominio","Aumentare la velocità di accesso a determinati siti web considerati prioritari dalle autorità governative","Impedire l\'invio di e-mail verso indirizzi appartenenti a domini registrati in paesi stranieri","Bloccare l\'installazione di software proveniente da repository non approvati dal fornitore di servizi"], ans: 0, expl: "La censura DNS fa sparire un sito censurandone il nome DNS. Metodo ingenuo, facilmente aggirabile.", cat: "SOCDIG"},
+{q: "Perché una raccolta di idee diventi una \'consultazione\' su una politica pubblica devono verificarsi:", opts: ["La raccolta di almeno un milione di firme certificate e l\'approvazione del Parlamento europeo","La gestione esclusiva attraverso un software di voto elettronico certificato con garanzia di anonimato assoluto per tutti i partecipanti al processo","L\'avvio di soli sondaggi d\'opinione anonimi senza alcun impegno formale da parte delle istituzioni coinvolte","L\'avvio sulla base di un documento chiaro e trasparente su problemi e obiettivi, e l\'impegno dell\'istituzione a fornire feedback sulle proposte"], ans: 3, expl: "Secondo Regonini: documento esplicito + impegno a fornire feedback chiaro.", cat: "DEMOC"},
+{q: "Nella classificazione a 5 stelle degli OpenData, un file Excel con licenza aperta corrisponde a:", opts: ["1 stella, perché è disponibile online ma in formato non leggibile da macchina senza software specifico","2 stelle, perché è disponibile in formato strutturato e leggibile da macchina, anche se proprietario","4 stelle, perché i dati utilizzano URI per identificare le risorse e sono collegati ad altri dataset","5 stelle, perché i dati sono collegati a dati di terze parti formando una rete di linked open data"], ans: 1, expl: "2 stelle = formato strutturato leggibile da macchina (es. Excel), anche se proprietario.", cat: "DEMOC"},
+{q: "Il social reporting civico consiste nella possibilità per i cittadini di:", opts: ["Accedere ai profili personali dei funzionari pubblici sui social network per valutarne il comportamento privato","Inviare comunicazioni crittografate alle forze dell\'ordine per denunciare reati in forma completamente anonima","Pubblicare segnalazioni su disfunzioni di servizi e spazi pubblici, agendo come \'vedette civiche\'","Visualizzare in tempo reale le transazioni finanziarie di tutti gli enti pubblici del proprio comune di residenza"], ans: 2, expl: "Nei siti di social reporting i cittadini pubblicano segnalazioni agendo come \'vedette civiche\'.", cat: "DEMOC"},
+{q: "La \'democrazia liquida\', implementata ad esempio da LiquidFeedback, si caratterizza per:", opts: ["Un meccanismo di delega su temi specifici e a tempo, revocabile dal delegante quando lo desidera","L\'obbligo per tutti i cittadini di votare personalmente su ogni singola questione senza possibilità di delegare","La selezione casuale dei decisori politici attraverso un algoritmo di sorteggio digitale certificato","L\'esclusione di qualsiasi forma di delega, imponendo la partecipazione diretta permanente"], ans: 0, expl: "Democrazia liquida: delega su temi, a tempo, revocabile.", cat: "DEMOC"},
+{q: "La progettazione di uno spazio di partecipazione online richiede, prima della scelta del software:", opts: ["La definizione del logo e dell\'identità visiva della piattaforma digitale destinata ai cittadini, anche in considerazione delle circostanze specifiche del caso","La progettazione della struttura sociale: identificazione degli attori, del patto partecipativo e delle fasi del processo","L\'acquisto di server dedicati con capacità di calcolo sufficiente a gestire un numero elevato di utenti, tenendo conto degli aspetti normativi e regolamentari applicabili","La traduzione dell\'interfaccia in almeno tre lingue europee per rispettare le normative comunitarie, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Prima del software: progettare la struttura sociale (attori, patto partecipativo, fasi, regole).", cat: "DEMOC"},
+{q: "Il sistema operativo GNU/Linux nasce dalla combinazione di:", opts: ["Il sistema UNIX proprietario di AT&T e il browser Netscape Navigator sviluppato da Marc Andreessen","Il sistema operativo Windows di Microsoft e il progetto Apache della Apache Software Foundation","Il kernel HURD sviluppato dalla Free Software Foundation e il desktop environment KDE, anche in considerazione delle circostanze specifiche del caso","Il progetto GNU di Richard Stallman (strumenti e librerie) e il kernel Linux sviluppato da Linus Torvalds"], ans: 3, expl: "GNU/Linux = progetto GNU (Stallman, 1985: compilatore, editor, librerie) + kernel Linux (Torvalds, 1991).", cat: "SWLIB"},
+{q: "Una clausola tipica di una End User License Agreement (EULA) di software proprietario prevede:", opts: ["La possibilità di installare il software su un numero illimitato di dispositivi senza alcuna restrizione","Il divieto di modificare, ripubblicare e fare uso commerciale del software concesso in licenza","L\'obbligo per il produttore di rilasciare il codice sorgente del software entro trenta giorni dall\'acquisto","La garanzia illimitata e il rimborso totale in caso di qualsiasi malfunzionamento del prodotto"], ans: 1, expl: "Le EULA proprietarie vietano modifica, ripubblicazione e uso commerciale non autorizzato.", cat: "SWLIB"},
+{q: "La strategia del software proprietario mira a:", opts: ["Rendere disponibile il codice sorgente alla comunità per favorire la collaborazione e il miglioramento del prodotto","Creare dipendenza dell\'utente dal prodotto (lock-in), impedendo che i dati siano fruibili con altri software","Ridurre al minimo i costi di sviluppo rinunciando a qualsiasi forma di protezione legale sul codice","Favorire la concorrenza tra sviluppatori attraverso standard aperti e formati interoperabili di scambio dati"], ans: 1, expl: "La strategia proprietaria punta al lock-in: impedire usi \'non corretti\' e creare dipendenza dal prodotto.", cat: "SWLIB"},
+{q: "L\'affermazione \'il software libero è insicuro o pieno di bug\' è considerata un luogo comune perché:", opts: ["Il software libero non viene mai testato prima del rilascio e non prevede alcuna forma di controllo qualità, anche in considerazione delle circostanze specifiche del caso","Solo il software proprietario è soggetto a vulnerabilità di sicurezza, mentre il codice aperto è immune per definizione, tenendo conto degli aspetti normativi e regolamentari applicabili","I sistemi operativi liberi come GNU/Linux sono ampiamente utilizzati nei server (oltre il 60%) e nei supercomputer, dimostrando robustezza e affidabilità","Il software libero non è mai stato utilizzato in ambienti di produzione reali ma solo in contesti accademici sperimentali, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "GNU/Linux è il SO più diffuso sui server (>60%) e supercomputer, dimostrando robustezza. Il codice aperto permette alla comunità di trovare e correggere bug.", cat: "SWLIB"},
+{q: "Il principio di necessità nel trattamento dei dati personali (art. 3 del D.Lgs. 196/03) prevede che:", opts: ["Tutti i dati personali degli utenti debbano essere conservati per un periodo minimo di dieci anni, anche in considerazione delle circostanze specifiche del caso","I titolari del trattamento possano raccogliere qualsiasi tipologia di dato personale purché ne diano formale comunicazione all\'interessato tramite informativa, tenendo conto degli aspetti normativi e regolamentari applicabili","Solo i dati sensibili siano soggetti a limitazioni nel trattamento, mentre i dati personali comuni siano liberamente utilizzabili, in conformità con quanto previsto dalla disciplina vigente in materia","I sistemi informativi siano configurati riducendo al minimo l\'utilizzo di dati personali, escludendo il trattamento quando le finalità possono essere raggiunte con dati anonimi"], ans: 3, expl: "Principio di necessità: ridurre al minimo l\'uso di dati personali, preferendo dati anonimi quando possibile.", cat: "PRIV"},
+{q: "In base al disciplinare tecnico del D.Lgs. 196/03, la password deve:", opts: ["Essere composta da almeno otto caratteri, non contenere riferimenti facilmente riconducibili all\'incaricato e essere modificata almeno ogni sei mesi","Essere comunicata a tutti i colleghi dell\'ufficio per garantire la continuità operativa in caso di assenza, anche in considerazione delle circostanze specifiche del caso","Coincidere con il codice fiscale dell\'incaricato per facilitarne la memorizzazione e l\'identificazione, tenendo conto degli aspetti normativi e regolamentari applicabili","Essere modificata esclusivamente al momento della cessazione del rapporto di lavoro con il titolare, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "Almeno 8 caratteri, nessun riferimento all\'incaricato, modifica ogni 6 mesi (3 per dati sensibili).", cat: "PRIV"},
+{q: "Il profilo di autorizzazione informatica serve a:", opts: ["Identificare il soggetto che vuole accedere al sistema informatico verificandone le credenziali di autenticazione, anche in considerazione delle circostanze specifiche del caso","Limitare l\'accesso di ciascun incaricato autenticato ai soli dati personali e alle sole operazioni di trattamento previsti dal suo profilo","Crittografare tutte le comunicazioni interne dell\'organizzazione in modo automatico e trasparente, tenendo conto degli aspetti normativi e regolamentari applicabili","Generare copie di backup dei dati personali con cadenza giornaliera su supporti esterni rimovibili, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "L\'autorizzazione (dopo l\'autenticazione) limita l\'accesso ai soli dati e operazioni previsti dal profilo. A è l\'autenticazione.", cat: "PRIV"},
+{q: "Secondo la Direttiva 31/2000/CE, il prestatore di un servizio di hosting:", opts: ["È responsabile diretto di tutti i contenuti caricati dagli utenti e deve verificarli preventivamente prima della pubblicazione","Ha l\'obbligo di monitorare costantemente tutti i contenuti degli utenti alla ricerca di materiale illecito","Non è responsabile delle informazioni memorizzate a richiesta di un utente, purché non ne sia a conoscenza dell\'illiceità","Deve identificare con documento d\'identità ogni utente che carica contenuti sulla sua piattaforma online"], ans: 2, expl: "Il prestatore di hosting non è responsabile se non conosce l\'illiceità. Nessun obbligo generale di sorveglianza.", cat: "PRIV"},
+{q: "La Società per Azioni (Spa) si distingue dalla Società in nome collettivo (Snc) perché:", opts: ["Nella Spa i soci rispondono illimitatamente e solidalmente per tutte le obbligazioni sociali contratte","Nella Snc il capitale sociale minimo è di 120.000 euro e la gestione è affidata a un consiglio di amministrazione","Nella Snc esiste una separazione formale tra la qualifica di socio e quella di amministratore della società","Nella Spa la responsabilità dei soci è limitata al capitale conferito e il patrimonio personale non è aggredibile"], ans: 3, expl: "Nella Spa (società di capitali) la responsabilità è limitata al capitale conferito. Nella Snc i soci rispondono illimitatamente.", cat: "ECON"},
+{q: "Lo switching cost costituisce una barriera all\'entrata perché:", opts: ["Rappresenta il costo che i consumatori dovrebbero sostenere per cambiare lo standard di riferimento o il fornitore","Indica il costo di produzione che un\'impresa sostiene per passare da un processo artigianale a uno industriale","È il costo fiscale imposto dallo Stato alle imprese che intendono entrare in un nuovo settore economico","Rappresenta l\'investimento pubblicitario minimo necessario per far conoscere un nuovo marchio ai consumatori"], ans: 0, expl: "Lo switching cost è il costo di cambiamento per passare a nuovo standard/fornitore.", cat: "ECON"},
+{q: "Secondo Deborah Johnson, il riconoscimento che la tecnologia non è costituita solo da artefatti, ma da artefatti incorporati nelle pratiche sociali, è essenziale per:", opts: ["Comprendere la connessione tra etica e tecnologie dell\'informazione e fondare lo studio della Computer Ethics","Progettare interfacce grafiche più intuitive e accessibili per gli utenti meno esperti di tecnologia","Determinare il prezzo ottimale di vendita dei prodotti software sul mercato internazionale, anche in considerazione delle circostanze specifiche del caso","Calcolare il ritorno economico degli investimenti in ricerca e sviluppo delle aziende tecnologiche, tenendo conto degli aspetti normativi e regolamentari applicabili"], ans: 0, expl: "Johnson: riconoscere la tecnologia come \'prodotto sociale\' è il presupposto per la Computer Ethics.", cat: "ETICA"},
+{q: "I sistemi di videosorveglianza sollevano questioni di privacy perché:", opts: ["Le immagini e i suoni catturati sono considerati dati personali dalla normativa e ricevono le stesse tutele","Le telecamere di sorveglianza possono funzionare esclusivamente in ambienti pubblici senza alcun vincolo normativo","La normativa vigente sulla protezione dei dati personali non si applica ai sistemi di videosorveglianza in quanto strumenti finalizzati alla sicurezza pubblica","Le immagini registrate non possono mai essere conservate per un periodo superiore alle ventiquattro ore"], ans: 0, expl: "La normativa include suoni e immagini nella definizione di dato personale, con stesse tutele.", cat: "PRIV"},
+{q: "La Società Cooperativa Sociale si distingue dalle altre cooperative perché:", opts: ["Non ha alcun vincolo sul numero minimo di soci e può essere costituita anche da una sola persona, anche in considerazione delle circostanze specifiche del caso","Promuove l\'integrazione sociale attraverso servizi sociosanitari/educativi e l\'inserimento lavorativo di persone svantaggiate","Ha come unico scopo il profitto economico e la distribuzione degli utili tra i soci in proporzione alle quote, tenendo conto degli aspetti normativi e regolamentari applicabili","Può essere costituita esclusivamente da enti pubblici e non ammette la partecipazione di privati cittadini, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "La cooperativa sociale promuove integrazione tramite servizi sociosanitari/educativi e inserimento lavorativo di persone svantaggiate.", cat: "ECON"}
+,
+{q: "La Product Function Structure (PFS) e la Product Breakdown Structure (PBS) sono strumenti utilizzati nella fase di:", opts: ["Esecuzione del progetto, per monitorare lo stato di avanzamento delle attività operative, anche in considerazione delle circostanze specifiche del caso","Sequenziamento, per calcolare il percorso critico e allocare le risorse disponibili, tenendo conto degli aspetti normativi e regolamentari applicabili","Definizione del progetto, per descrivere rispettivamente le funzioni da realizzare e gli output da sviluppare","Terminazione, per redigere il rapporto finale e consegnare i risultati al committente, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 2, expl: "PFS descrive le funzioni, PBS gli output. Entrambi sono alberi prodotti nella fase di Definizione del progetto.", cat: "COSTI"},
+{q: "L\'elasticità di prezzo incrociata misura:", opts: ["Il grado in cui le vendite di un\'impresa sono influenzate dalle variazioni di prezzo praticate da un\'altra impresa del settore","Il rapporto tra la variazione del costo fisso unitario e la variazione del volume di produzione complessivo, anche in considerazione delle circostanze specifiche del caso","La sensibilità della domanda di un prodotto rispetto alle variazioni del reddito medio dei consumatori, tenendo conto degli aspetti normativi e regolamentari applicabili","L\'effetto di una variazione del tasso di interesse sulla propensione al risparmio delle famiglie, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "L\'elasticità incrociata di prezzo eP,ij misura quanto le vendite dell\'impresa j sono influenzate da variazioni di prezzo dell\'impresa i.", cat: "ECON"},
+{q: "La steganografia è una tecnica che permette di:", opts: ["Nascondere un messaggio all\'interno di un altro contenuto (immagine, audio, video) in modo che la sua presenza non sia rilevabile","Cifrare un messaggio utilizzando una chiave pubblica e una privata secondo lo standard RSA, anche in considerazione delle circostanze specifiche del caso","Autenticare l\'identità di un utente tramite la scansione biometrica delle impronte digitali, tenendo conto degli aspetti normativi e regolamentari applicabili","Comprimere i dati in modo irreversibile per ridurre lo spazio occupato sui supporti di memorizzazione, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "La steganografia nasconde un messaggio dentro un altro contenuto. È citata tra gli strumenti di difesa digitale insieme a Tor e crittografia.", cat: "SOCDIG"},
+{q: "Il protocollo TCP/IP è stato progettato nel:", opts: ["1957, contestualmente all\'invenzione del primo circuito integrato da parte di Jack Kilby della Texas Instruments","1984, come evoluzione del protocollo HTTP per il World Wide Web ideato da Tim Berners-Lee","1947, ai Bell Labs insieme all\'invenzione del transistor da parte di Shockley, Bardeen e Brattain","1973, da Robert Kahn e Vincent Cerf, gettando le basi per quella che oggi conosciamo come Internet"], ans: 3, expl: "TCP/IP nasce nel 1973 da Kahn e Cerf. Con la commutazione a pacchetto di Paul Baran nasce Internet.", cat: "ETICA"},
+{q: "Il primo transistor è stato inventato nel:", opts: ["1951, dalla Remington Rand nei laboratori che svilupparono lo UNIVAC I","1965, da Gordon Moore contestualmente alla formulazione della sua famosa legge","1834, da Charles Babbage come componente dell\'Analytical Engine progettato in Inghilterra","1947, ai Bell Labs da William Shockley, John Bardeen e Walter Brattain"], ans: 3, expl: "Dicembre 1947, Bell Labs: Shockley, Bardeen e Brattain inventano il transistor. Passaggio tecnologico cruciale.", cat: "ETICA"},
+{q: "Il primo corso universitario di Computer Ethics in Italia è stato tenuto nel:", opts: ["2008, al Politecnico di Torino, come primo insegnamento italiano dedicato all\'etica informatica","1968, all\'Università di Bologna, contestualmente alla pubblicazione di Parker sulle regole etiche","1995, alla De Montfort University nel Regno Unito come parte del programma CCSR europeo","1985, all\'Università di Milano, in concomitanza con la pubblicazione del GNU Manifesto di Stallman"], ans: 0, expl: "Il primo corso di Computer Ethics in Italia fu tenuto al Politecnico di Torino nel 2008 (Norberto Patrignani).", cat: "ETICA"},
+{q: "Una fotografia, ai fini della normativa sulla privacy, è considerata:", opts: ["Un dato personale, in quanto informazione relativa a una persona fisica identificata o identificabile","Un dato sensibile, in quanto rivela informazioni sull\'aspetto fisico e l\'origine etnica della persona","Un dato anonimo, salvo che non sia accompagnata dal nome e cognome della persona ritratta","Un dato non rilevante ai fini della protezione dei dati personali vigente nell\'ordinamento italiano"], ans: 0, expl: "La fotografia è un dato personale perché permette di identificare una persona. Non è dato sensibile (categoria tassativa diversa).", cat: "PRIV"},
+{q: "Il significato di una sequenza di byte dipende:", opts: ["Dall\'interprete che la legge: la stessa sequenza può rappresentare testo, immagine o istruzione a seconda del contesto","Esclusivamente dal sistema operativo installato sul dispositivo, indipendentemente dal software applicativo, anche in considerazione delle circostanze specifiche del caso","Dalla lunghezza della sequenza stessa: sequenze corte sono sempre testo e sequenze lunghe immagini, tenendo conto degli aspetti normativi e regolamentari applicabili","Dal protocollo di rete utilizzato per trasmetterla, che ne determina univocamente il formato, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "La semantica dei byte è data dall\'interprete (Macchina di Turing): la stessa sequenza binaria può significare cose diverse.", cat: "SOCDIG"},
+{q: "Il diritto di cronaca può entrare in conflitto con il diritto all\'oblio quando:", opts: ["Una notizia non più attuale viene costantemente ripubblicata in rete dai motori di ricerca, ledendo la reputazione dell\'interessato","Un giornalista pubblica un articolo contenente esclusivamente fatti di dominio pubblico e di rilevanza attuale, anche in considerazione delle circostanze specifiche del caso","L\'interessato ha espressamente autorizzato la pubblicazione e la diffusione dei propri dati personali, tenendo conto degli aspetti normativi e regolamentari applicabili","La notizia riguarda un personaggio pubblico nell\'esercizio delle proprie funzioni istituzionali attuali, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "Il conflitto sorge quando notizie non più attuali restano accessibili online. Il Garante ha precisato che la diffusione generalizzata di notizie non attuali viola il diritto all\'oblio.", cat: "PRIV"},
+{q: "Un ebook può essere distribuito con licenza Creative Commons?", opts: ["Sì, le licenze CC sono applicabili a tutte le opere protette dal diritto d\'autore, inclusi testi e pubblicazioni digitali","No, le licenze CC sono applicabili esclusivamente a fotografie, brani musicali e contenuti audiovisivi, anche in considerazione delle circostanze specifiche del caso","Sì, ma solo se l\'ebook è stato preventivamente registrato presso l\'ufficio brevetti e marchi europeo, tenendo conto degli aspetti normativi e regolamentari applicabili","No, gli ebook sono protetti esclusivamente dalla normativa sul brevetto industriale e non dal diritto d\'autore, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "Le CC sono applicabili a tutte le opere protette dal diritto d\'autore: letteratura, cinema, musica, fotografia. Gli ebook rientrano.", cat: "PROPR"},
+{q: "Secondo Lessig, i quattro strumenti principali per la governance di Internet sono:", opts: ["Hardware, software, firmware e middleware, che costituiscono l\'architettura tecnica della rete globale","Educazione (codici etici), leggi (vincoli legali), architettura tecnologica e mercato (autoregolazione)","Brevetti, marchi, copyright e segreti commerciali, come forme di protezione della proprietà intellettuale","Parlamento, governo, magistratura e autorità garante, come organi istituzionali di controllo della rete"], ans: 1, expl: "Lessig (Code and Other Laws of Cyberspace, 1999): educazione (soft-laws), leggi (hard-laws), architettura tecnologica, mercato.", cat: "ETICA"},
+{q: "Nello Stato Patrimoniale, la voce \'Crediti verso soci per versamenti ancora dovuti\' è classificata:", opts: ["Nel Passivo, tra i debiti a breve termine dell\'impresa verso i propri azionisti e soci fondatori, anche in considerazione delle circostanze specifiche del caso","Nell\'Attivo, come prima voce (A), e rappresenta la parte di capitale sottoscritta ma non ancora versata dai soci","Nel Conto Economico, tra i ricavi straordinari derivanti dall\'attività di finanziamento dei soci, tenendo conto degli aspetti normativi e regolamentari applicabili","Nel Passivo, sotto il Patrimonio Netto, come componente negativa che riduce il capitale sociale, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 1, expl: "Nello SP è la voce A dell\'Attivo: crediti verso soci per la parte di capitale sottoscritta ma non ancora versata.", cat: "ECON"},
+{q: "Le misure minime di sicurezza nel trattamento dei dati personali sono disciplinate:", opts: ["Nell\'Allegato B (disciplinare tecnico) del Codice in materia di protezione dei dati personali (D.Lgs. 196/03)","Nella Direttiva 95/46/CE, che stabilisce solo principi generali senza specificare misure tecniche concrete","Nel Codice della Proprietà Industriale (D.Lgs. 30/2005), che disciplina brevetti e marchi registrati","Nella Legge 633/41 sul diritto d\'autore, nella sezione dedicata alla protezione delle opere digitali"], ans: 0, expl: "Le misure minime di sicurezza sono disciplinate dagli artt. 34-35 del D.Lgs. 196/03 e dall\'Allegato B (disciplinare tecnico).", cat: "PRIV"},
+{q: "Il livello 6 dell\'arcobaleno dei diritti della cittadinanza digitale corrisponde a:", opts: ["Il diritto all\'accesso al servizio universale (access), come prerequisito per ogni forma di partecipazione","Il diritto ad essere ascoltati e consultati (consultation), con feedback da parte dell\'istituzione","Il diritto alla trasparenza (transparency), ovvero il diritto a ricevere informazioni dalla PA","Il diritto al coinvolgimento attivo nelle scelte e nelle politiche (active participation) della PA"], ans: 1, expl: "Livello 6 = consultazione (ascolto). I cittadini forniscono informazioni che richiedono feedback dall\'istituzione.", cat: "DEMOC"},
+{q: "L\'esempio dei sottopassaggi di Long Island progettati da Robert Moses dimostra che:", opts: ["Le infrastrutture fisiche e gli artefatti tecnologici possono incorporare valori sociali e politici discriminatori","La progettazione urbanistica negli Stati Uniti è sempre stata orientata all\'inclusione sociale di tutte le etnie","I sottopassaggi furono progettati troppo bassi per errore di calcolo e non per ragioni di discriminazione","Le barriere architettoniche sono un problema esclusivamente contemporaneo legato alla disabilità fisica"], ans: 0, expl: "Winner: i sottopassaggi di Moses erano troppo bassi per i bus (riservati ai neri). Artefatto che incorpora valori e rafforza il sistema di classi.", cat: "ETICA"},
+{q: "Il Web 2.0 è definito come:", opts: ["Il Web \'read-write\' dove chiunque può scrivere e pubblicare contenuti tramite blog, wiki e social network (people connectivity)","Il Web semantico dove i dati sono corredati di metadati in formato RDF per la comprensione automatica da parte delle macchine","La prima versione del World Wide Web, caratterizzata da pagine statiche consultabili in sola lettura da pochi utenti","Un protocollo di comunicazione crittografata che ha sostituito il protocollo HTTP standard nel 2010"], ans: 0, expl: "Web 2.0 = read-write (chiunque scrive tramite blog, wiki, social network). Web 3.0 = semantic web, machine-readable.", cat: "ETICA"},
+{q: "ACTA, SOPA, PIPA e HADOPI sono esempi di:", opts: ["Standard tecnici per la sicurezza delle reti sviluppati dall\'Internet Engineering Task Force (IETF), anche in considerazione delle circostanze specifiche del caso","Tentativi legislativi di controllare la rete che rischiano di criminalizzare strumenti e comportamenti legittimi","Protocolli di crittografia avanzata per la protezione delle comunicazioni digitali dei cittadini europei","Organizzazioni no-profit internazionali che promuovono il software libero e i formati aperti di dati, tenendo conto degli aspetti normativi e regolamentari applicabili"], ans: 1, expl: "ACTA, SOPA, PIPA, HADOPI sono tentativi legislativi di controllare la rete che rischiano di criminalizzare strumenti legittimi.", cat: "SOCDIG"},
+{q: "Il ruolo etico dei motori di ricerca è una questione rilevante perché:", opts: ["I risultati oltre la prima pagina non vengono quasi mai consultati dal 95% degli utenti, conferendo ai motori un enorme potere nella selezione dei contenuti","I motori di ricerca pubblicano esclusivamente contenuti verificati e certificati da autorità governative, anche in considerazione delle circostanze specifiche del caso","L\'algoritmo di indicizzazione è completamente trasparente e accessibile a tutti gli utenti della rete, tenendo conto degli aspetti normativi e regolamentari applicabili","I motori di ricerca non hanno alcuna influenza sulla formazione del pensiero critico delle persone, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "Se il 95% non va oltre la prima pagina, chi controlla i motori controlla l\'accesso alla conoscenza. Questione etica cruciale.", cat: "ETICA"},
+{q: "In un mercato di concorrenza perfetta, l\'impresa è definita \'price-taker\' perché:", opts: ["La sua quota di mercato è talmente piccola che non può influenzare il prezzo, che è determinato dall\'incontro tra domanda e offerta","L\'impresa fissa il prezzo di vendita e i consumatori devono accettarlo senza possibilità di negoziazione, anche in considerazione delle circostanze specifiche del caso","Lo Stato regola i prezzi di tutti i beni e servizi venduti nel mercato attraverso apposite commissioni, tenendo conto degli aspetti normativi e regolamentari applicabili","I consumatori determinano il prezzo e le imprese devono adeguarsi ai livelli stabiliti dai compratori, in conformità con quanto previsto dalla disciplina vigente in materia"], ans: 0, expl: "In concorrenza perfetta ogni impresa ha quota di mercato minima e non può influenzare il prezzo. La curva di domanda è infinitamente elastica.", cat: "ECON"},
+{q: "Nelle società di capitali, la separazione tra proprietà e controllo significa che:", opts: ["I soci (proprietari) delegano il potere di amministrare a uno o più amministratori eletti dall\'assemblea","Tutti i soci partecipano direttamente e personalmente alla gestione operativa quotidiana dell\'impresa","Non esiste distinzione tra la qualifica di socio e quella di amministratore nella struttura societaria","Il patrimonio personale dei soci è aggredibile per le obbligazioni sociali della società in ogni caso"], ans: 0, expl: "Nelle società di capitali c\'è separazione tra proprietà (soci) e controllo (amministratori eletti dall\'assemblea). I soci esercitano i diritti in assemblea.", cat: "ECON"}];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function shuffleOptions(questions) {
+  return questions.map(q => {
+    const correctText = q.opts[q.ans];
+    const indices = Array.from({length: q.opts.length}, (_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    const newOpts = indices.map(i => q.opts[i]);
+    const newAns = newOpts.indexOf(correctText);
+    return { ...q, opts: newOpts, ans: newAns };
+  });
+}
+
+const LETTERS = ["A", "B", "C", "D", "E"];
+
+function BiometriaQuiz() {
+  const [mode, setMode] = useState("menu");
+  const [darkMode, setDarkMode] = useState(() => {
+    try { return localStorage.getItem("aelse_theme") !== "light"; } catch(e) { return true; }
+  });
+  const toggleTheme = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    try { localStorage.setItem("aelse_theme", newMode ? "dark" : "light"); } catch(e) {}
+  };
+  // Theme colors
+  const T = darkMode ? {
+    bg:"#0a0a0f", text:"#e0e0e0", textSoft:"#ccc", textMuted:"#888", textFaint:"#555",
+    cardBg:"#1a1a2e", cardBg2:"#111118", cardBg3:"#111122", border:"#222", borderLight:"#333",
+    inputBg:"#111118"
+  } : {
+    bg:"#f5f5f7", text:"#1a1a2e", textSoft:"#333", textMuted:"#666", textFaint:"#999",
+    cardBg:"#ffffff", cardBg2:"#f0f0f5", cardBg3:"#e8e8f0", border:"#ddd", borderLight:"#ccc",
+    inputBg:"#ffffff"
+  };
+  const [questions, setQuestions] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [revealed, setRevealed] = useState(false);
+  const [score, setScore] = useState(0);
+  const [wrong, setWrong] = useState([]);
+  const [startTime, setStartTime] = useState(null);
+  const [elapsed, setElapsed] = useState(0);
+  const [isSimulation, setIsSimulation] = useState(false);
+  const [timeLimit, setTimeLimit] = useState(null);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [isRipasso, setIsRipasso] = useState(false);
+  const [ripassoCount, setRipassoCount] = useState(0);
+  const [masteredCount, setMasteredCount] = useState(0);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showResetFinal, setShowResetFinal] = useState(false);
+  const [showCert, setShowCert] = useState(false);
+  const [certName, setCertName] = useState(() => {
+    try { return localStorage.getItem("aelse_cert_name") || ""; } catch(e) { return ""; }
+  });
+  const [certGenerated, setCertGenerated] = useState(false);
+  const certRedeemed = certName.trim().length > 0;
+  const [streak, setStreak] = useState(() => {
+    try { return parseInt(localStorage.getItem("aelse_streak_current")) || 0; } catch(e) { return 0; }
+  });
+  const [bestStreak, setBestStreak] = useState(() => {
+    try { return parseInt(localStorage.getItem("aelse_streak_best")) || 0; } catch(e) { return 0; }
+  });
+  const [streakToast, setStreakToast] = useState(null);
+  const streakToastTimer = useRef(null);
+  const timerRef = useRef(null);
+
+  // Streak helpers
+  const STREAK_LEVELS = [
+    {min:300, fires:"💀", msg:"Bro stai studiando troppo 💀", duration:4000, style:"skull"},
+    {min:250, fires:"💀", msg:"Cooooosa?! 250 di fila?! Se non prendi 30L sei un pollo 😜", duration:4000, style:"skull"},
+    {min:200, fires:"🔥🔥🔥🔥🔥🔥", msg:"200 di fila!", duration:2500, style:"epic"},
+    {min:100, fires:"🔥🔥🔥🔥🔥", msg:"100 di fila!", duration:2500, style:"big"},
+    {min:50,  fires:"🔥🔥🔥🔥", msg:"50 di fila!", duration:2000, style:"big"},
+    {min:20,  fires:"🔥🔥🔥", msg:"20 di fila!", duration:2000, style:"big"},
+    {min:10,  fires:"🔥🔥", msg:"10 di fila!", duration:2000, style:"big"},
+    {min:5,   fires:"🔥", msg:"5 di fila!", duration:2000, style:"big"},
+  ];
+  const getStreakFires = (s) => {
+    if (s >= 300) return "💀💀";
+    if (s >= 250) return "💀";
+    if (s >= 200) return "🔥🔥🔥🔥🔥🔥";
+    if (s >= 100) return "🔥🔥🔥🔥🔥";
+    if (s >= 50) return "🔥🔥🔥🔥";
+    if (s >= 20) return "🔥🔥🔥";
+    if (s >= 10) return "🔥🔥";
+    if (s >= 5) return "🔥";
+    if (s >= 1) return "🔥";
+    return "";
+  };
+  const saveStreak = (current, best) => {
+    try {
+      localStorage.setItem("aelse_streak_current", current.toString());
+      localStorage.setItem("aelse_streak_best", best.toString());
+    } catch(e) {}
+  };
+  const triggerStreakToast = (newStreak) => {
+    const level = STREAK_LEVELS.find(l => newStreak === l.min);
+    if (!level) return;
+    if (streakToastTimer.current) clearTimeout(streakToastTimer.current);
+    setStreakToast({...level, count: newStreak});
+    streakToastTimer.current = setTimeout(() => setStreakToast(null), level.duration);
+  };
+  const incrementStreak = () => {
+    const newStreak = streak + 1;
+    const newBest = Math.max(bestStreak, newStreak);
+    setStreak(newStreak);
+    setBestStreak(newBest);
+    saveStreak(newStreak, newBest);
+    triggerStreakToast(newStreak);
+  };
+  const resetStreak = () => {
+    setStreak(0);
+    try { localStorage.setItem("aelse_streak_current", "0"); } catch(e) {}
+  };
+
+
+  // localStorage helpers for ripasso
+  const getRipassoSet = () => {
+    try {
+      const raw = localStorage.getItem("aelse_ripasso");
+      return raw ? new Set(JSON.parse(raw)) : new Set();
+    } catch(e) { return new Set(); }
+  };
+  const saveRipassoSet = (s) => {
+    try { localStorage.setItem("aelse_ripasso", JSON.stringify([...s])); } catch(e) {}
+  };
+  const addToRipasso = (questionText) => {
+    const s = getRipassoSet();
+    const idx = QUESTIONS.findIndex(q => q.q === questionText);
+    if (idx !== -1) { s.add(idx); saveRipassoSet(s); }
+  };
+  const removeFromRipasso = (questionText) => {
+    const s = getRipassoSet();
+    const idx = QUESTIONS.findIndex(q => q.q === questionText);
+    if (idx !== -1) { s.delete(idx); saveRipassoSet(s); }
+  };
+
+  // localStorage helpers for mastered (progress counter)
+  const getMasteredSet = () => {
+    try {
+      const raw = localStorage.getItem("aelse_mastered");
+      return raw ? new Set(JSON.parse(raw)) : new Set();
+    } catch(e) { return new Set(); }
+  };
+  const saveMasteredSet = (s) => {
+    try { localStorage.setItem("aelse_mastered", JSON.stringify([...s])); } catch(e) {}
+  };
+  const addToMastered = (questionText) => {
+    const s = getMasteredSet();
+    const idx = QUESTIONS.findIndex(q => q.q === questionText);
+    if (idx !== -1) { s.add(idx); saveMasteredSet(s); }
+  };
+
+  // Reset all progress
+  const resetAllProgress = () => {
+    try {
+      localStorage.removeItem("aelse_ripasso");
+      localStorage.removeItem("aelse_mastered");
+      localStorage.removeItem("aelse_cert_name");
+      localStorage.removeItem("aelse_streak_current");
+      localStorage.removeItem("aelse_streak_best");
+    } catch(e) {}
+    setRipassoCount(0);
+    setMasteredCount(0);
+    setCertName("");
+    setStreak(0);
+    setBestStreak(0);
+    setShowResetFinal(false);
+    setShowResetConfirm(false);
+  };
+
+
+  // Update counts on mount and when returning to menu
+  useEffect(() => {
+    if (mode === "menu") {
+      setRipassoCount(getRipassoSet().size);
+      setMasteredCount(getMasteredSet().size);
+    }
+  }, [mode]);
+
+  const startQuiz = (count, sim = false) => {
+    const shuffled = shuffleOptions(shuffle(QUESTIONS).slice(0, count));
+    setQuestions(shuffled);
+    setCurrent(0);
+    setSelected(null);
+    setRevealed(false);
+    setScore(0);
+    setWrong([]);
+    setStartTime(Date.now());
+    setElapsed(0);
+    setIsSimulation(sim);
+    setIsRipasso(false);
+    setTimeLimit(sim ? 2400 : null);
+    setShowExitConfirm(false);
+    setMode("quiz");
+  };
+
+  const startRipasso = () => {
+    const ripassoIndices = getRipassoSet();
+    if (ripassoIndices.size === 0) return;
+    const ripassoQuestions = [...ripassoIndices].map(i => QUESTIONS[i]).filter(Boolean);
+    const shuffled = shuffleOptions(shuffle(ripassoQuestions));
+    setQuestions(shuffled);
+    setCurrent(0);
+    setSelected(null);
+    setRevealed(false);
+    setScore(0);
+    setWrong([]);
+    setStartTime(Date.now());
+    setElapsed(0);
+    setIsSimulation(false);
+    setIsRipasso(true);
+    setTimeLimit(null);
+    setShowExitConfirm(false);
+    setMode("quiz");
+  };
+
+  const startConquista = () => {
+    const mastered = getMasteredSet();
+    const unconquered = QUESTIONS.map((q, i) => ({...q, _origIdx: i})).filter((_, i) => !mastered.has(i));
+    if (unconquered.length === 0) return;
+    const picked = shuffle(unconquered).slice(0, Math.min(20, unconquered.length));
+    const shuffled = shuffleOptions(picked);
+    setQuestions(shuffled);
+    setCurrent(0);
+    setSelected(null);
+    setRevealed(false);
+    setScore(0);
+    setWrong([]);
+    setStartTime(Date.now());
+    setElapsed(0);
+    setIsSimulation(false);
+    setIsRipasso(false);
+    setTimeLimit(null);
+    setShowExitConfirm(false);
+    setMode("quiz");
+  };
+
+  useEffect(() => {
+    if (mode === "quiz") {
+      timerRef.current = setInterval(() => {
+        const e = Math.floor((Date.now() - startTime) / 1000);
+        setElapsed(e);
+        if (isSimulation && e >= 2400) {
+          clearInterval(timerRef.current);
+          setMode("results");
+        }
+      }, 1000);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [mode, startTime, isSimulation]);
+
+  const handleSelect = (idx) => { if (!revealed) setSelected(prev => prev === idx ? null : idx); };
+
+  const handleConfirm = () => {
+    if (selected === null) return;
+    setRevealed(true);
+    const q = questions[current];
+    if (selected === q.ans) {
+      setScore(s => s + 1);
+      if (isRipasso) removeFromRipasso(q.q);
+      addToMastered(q.q);
+      incrementStreak();
+    } else {
+      setWrong(w => [...w, { ...q, userAns: selected }]);
+      addToRipasso(q.q);
+      resetStreak();
+    }
+  };
+
+  const handleNext = () => {
+    if (current + 1 >= questions.length) {
+      clearInterval(timerRef.current);
+      setMode("results");
+    } else {
+      setCurrent(c => c + 1);
+      setSelected(null);
+      setRevealed(false);
+    }
+  };
+
+  const handleExit = () => setShowExitConfirm(true);
+  const isCleanExit = revealed; // punto pulito = risposta già rivelata
+  const confirmExit = () => {
+    clearInterval(timerRef.current);
+    if (!isCleanExit) resetStreak();
+    setMode("menu");
+    setShowExitConfirm(false);
+  };
+  const cancelExit = () => setShowExitConfirm(false);
+
+  // Protect streak on refresh/close/navigate away
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (mode === "quiz" && !revealed) {
+        // Punto sporco: azzera streak in localStorage direttamente
+        try { localStorage.setItem("aelse_streak_current", "0"); } catch(e) {}
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [mode, revealed]);
+
+  const formatTime = (s) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,"0")}`;
+  const formatCountdown = (s) => { const r = Math.max(0, 2400 - s); return formatTime(r); };
+
+  const calcGrade = (sc, tot) => {
+    if (!isSimulation) return null;
+    const ratio = sc / tot;
+    const ref = 24/40; // 24/40 = 18
+    if (ratio < ref) {
+      return Math.max(0, Math.ceil(ratio / ref * 18));
+    }
+    if (ratio >= 1.0) return 31; // 30L
+    const g = Math.ceil(18 + (ratio - ref) / (1 - ref) * 12);
+    return Math.min(g, 30);
+  };
+
+  // MENU
+  if (mode === "menu") {
+    return (
+      <div style={{minHeight:"100vh",background:T.bg,color:T.text,fontFamily:"'JetBrains Mono','Fira Code',monospace",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:20}}>
+        <div style={{textAlign:"center",maxWidth:550,width:"100%"}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:12}}>
+            <button onClick={()=>setMode("study")} style={{background:"transparent",border:"none",cursor:"pointer",padding:6,color:T.textMuted,transition:"color 0.2s"}} title="Modalità studio">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            <button onClick={toggleTheme} style={{background:"transparent",border:"none",cursor:"pointer",padding:6,color:T.textMuted,transition:"color 0.2s"}} title={darkMode?"Modalità giorno":"Modalità notte"}>
+              {darkMode ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </button>
+          </div>
+          <h1 style={{fontSize:24,color:"#ff4444",marginBottom:4,letterSpacing:2}}>SUPER TEST DI</h1>
+          <h1 style={{fontSize:24,color:"#ff4444",marginTop:0,letterSpacing:2}}>ASPETTI ETICI DELL'INFORMATICA</h1>
+          <p style={{color:T.textMuted,fontSize:12,marginBottom:24}}>Creato da Gabriele Lannutti</p>
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            {(() => {
+              const unconqueredCount = QUESTIONS.length - masteredCount;
+              const showConquista = unconqueredCount > 0;
+              const shownCount = Math.min(20, unconqueredCount);
+              const conquistaLabel = "DOMANDE NUOVE (" + shownCount + (shownCount === 1 ? " domanda non appresa)" : " domande non apprese)");
+              const buttons = [
+                {label:"QUIZ COMPLETO (40 domande casuali)",action:()=>startQuiz(40,true),color:"#ff4444"},
+                showConquista
+                  ? {label:conquistaLabel,action:startConquista,color:"#44aaff"}
+                  : {label:"RIPASSO VELOCE (20 domande)",action:()=>startQuiz(20,false),color:"#44aaff"},
+                {label:"TUTTE LE " + QUESTIONS.length + " DOMANDE",action:()=>startQuiz(QUESTIONS.length,false),color:"#aa44ff"},
+              ];
+              return buttons.map((btn,i)=>(
+                <button key={i} onClick={btn.action}
+                  style={{padding:"14px 20px",background:"transparent",border:`2px solid ${btn.color}`,color:btn.color,fontSize:13,fontFamily:"inherit",cursor:"pointer",borderRadius:4,fontWeight:700,transition:"all 0.2s"}}
+                  onMouseEnter={e=>{e.target.style.background=btn.color;e.target.style.color="#0a0a0f"}}
+                  onMouseLeave={e=>{e.target.style.background="transparent";e.target.style.color=btn.color}}>
+                  {btn.label}
+                </button>
+              ));
+            })()}
+
+            {/* Easter egg button — only when all mastered */}
+            {masteredCount >= QUESTIONS.length && !certRedeemed && (
+              <button onClick={() => {setShowCert(true);setCertGenerated(false);}}
+                style={{padding:"14px 20px",background:"transparent",border:"2px solid #c8860a",color:darkMode?"#ffd700":"#996600",fontSize:13,fontFamily:"inherit",cursor:"pointer",borderRadius:4,fontWeight:700,transition:"all 0.2s"}}
+                onMouseEnter={e=>{e.target.style.background=darkMode?"#ffd700":"#c8860a";e.target.style.color="#0a0a0f"}}
+                onMouseLeave={e=>{e.target.style.background="transparent";e.target.style.color=darkMode?"#ffd700":"#996600"}}>
+                {"🏆 HAI APPRESO TUTTO — RITIRA IL CERTIFICATO"}
+              </button>
+            )}
+
+            
+
+            {ripassoCount > 0 && (
+              <button onClick={startRipasso}
+                style={{padding:"14px 20px",background:"transparent",border:"2px solid #00cc66",color:"#00cc66",fontSize:13,fontFamily:"inherit",cursor:"pointer",borderRadius:4,fontWeight:700,transition:"all 0.2s",marginTop:4}}
+                onMouseEnter={e=>{e.target.style.background="#00cc66";e.target.style.color="#0a0a0f"}}
+                onMouseLeave={e=>{e.target.style.background="transparent";e.target.style.color="#00cc66"}}>
+                {"RIPASSO (" + ripassoCount + " domande da rivedere)"}
+              </button>
+            )}
+          </div>
+
+          {/* Unified stats box */}
+          <div style={{marginTop:20,padding:"12px 16px",background:T.cardBg2,borderRadius:6,border:`1px solid ${T.border}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+              <span style={{fontSize:11,color:T.textMuted}}>Domande apprese</span>
+              <span style={{fontSize:13,fontWeight:900,color: masteredCount >= QUESTIONS.length ? "#00ff88" : masteredCount >= QUESTIONS.length*0.75 ? "#44aaff" : masteredCount >= QUESTIONS.length*0.5 ? "#ff8800" : "#ff4444"}}>{masteredCount}/{QUESTIONS.length}</span>
+            </div>
+            <div style={{height:6,background:darkMode?"#1a1a2e":"#ddd",borderRadius:3,overflow:"hidden",marginBottom: (streak > 0 || bestStreak > 0) ? 8 : 0}}>
+              <div style={{height:"100%",borderRadius:3,transition:"width 0.5s ease",width:`${(masteredCount/QUESTIONS.length)*100}%`,background: masteredCount >= QUESTIONS.length ? "#00ff88" : masteredCount >= QUESTIONS.length*0.75 ? "#44aaff" : masteredCount >= QUESTIONS.length*0.5 ? "#ff8800" : "#ff4444"}}/>
+            </div>
+            {streak > 0 && (
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom: bestStreak > 0 ? 4 : 0}}>
+                <span style={{fontSize:11,color:T.textMuted}}>Streak attuale</span>
+                <span style={{fontSize:12,fontWeight:700,color:"#ff8800"}}>{getStreakFires(streak)} {streak}</span>
+              </div>
+            )}
+            {bestStreak > 0 && (
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <span style={{fontSize:11,color:T.textMuted}}>Miglior streak</span>
+                <span style={{fontSize:12,fontWeight:700,color:"#e07020"}}>{getStreakFires(bestStreak)} {bestStreak}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Reset — ghost button, very discreet */}
+          {masteredCount > 0 && (
+            <p onClick={() => setShowResetConfirm(true)} style={{color:darkMode?"#2a2a2a":"#ccc",fontSize:9,marginTop:12,cursor:"pointer",transition:"color 0.2s"}} onMouseEnter={e=>e.target.style.color=darkMode?"#555":"#888"} onMouseLeave={e=>e.target.style.color=darkMode?"#2a2a2a":"#ccc"}>Reset progresso</p>
+          )}
+
+          {/* Reset confirm — step 1 */}
+          {showResetConfirm && !showResetFinal && (
+            <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.85)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <div style={{background:T.cardBg,border:"1px solid #ff4444",borderRadius:8,padding:24,textAlign:"center",maxWidth:340}}>
+                <p style={{fontSize:13,marginBottom:6,color:"#ff8888",fontWeight:700}}>Attenzione</p>
+                <p style={{fontSize:12,marginBottom:16,color:T.textSoft}}>Stai per cancellare tutto il progresso: domande apprese, domande da ripassare, streak attuale e record streak. Questa azione è irreversibile.</p>
+                <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+                  <button onClick={() => setShowResetFinal(true)} style={{padding:"8px 20px",background:"#ff4444",color:"#000",border:"none",borderRadius:4,fontWeight:700,cursor:"pointer",fontFamily:"inherit",fontSize:12}}>CONTINUA</button>
+                  <button onClick={() => {setShowResetConfirm(false);setShowResetFinal(false);}} style={{padding:"8px 20px",background:"transparent",color:"#44aaff",border:"1px solid #44aaff",borderRadius:4,fontWeight:700,cursor:"pointer",fontFamily:"inherit",fontSize:12}}>ANNULLA</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Reset confirm — step 2 (final) */}
+          {showResetConfirm && showResetFinal && (
+            <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.85)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <div style={{background:T.cardBg,border:"1px solid #ff4444",borderRadius:8,padding:24,textAlign:"center",maxWidth:340}}>
+                <p style={{fontSize:13,marginBottom:6,color:"#ff4444",fontWeight:700}}>Sei davvero sicuro?</p>
+                <p style={{fontSize:12,marginBottom:16,color:T.textSoft}}>Perderai {masteredCount} domande apprese, {ripassoCount} domande nel ripasso e il tuo record streak di {bestStreak}. Non si può tornare indietro.</p>
+                <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+                  <button onClick={resetAllProgress} style={{padding:"8px 20px",background:"#ff4444",color:"#000",border:"none",borderRadius:4,fontWeight:700,cursor:"pointer",fontFamily:"inherit",fontSize:12}}>SÌ, CANCELLA TUTTO</button>
+                  <button onClick={() => {setShowResetConfirm(false);setShowResetFinal(false);}} style={{padding:"8px 20px",background:"transparent",color:"#44aaff",border:"1px solid #44aaff",borderRadius:4,fontWeight:700,cursor:"pointer",fontFamily:"inherit",fontSize:12}}>ANNULLA</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+
+          {/* Certificate modal */}
+          {showCert && (
+            <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.92)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,overflowY:"auto"}}>
+              {/* Confetti */}
+              {[...Array(40)].map((_,i) => (
+                <div key={i} style={{
+                  position:"fixed",
+                  top:"-10px",
+                  left: `${Math.random()*100}%`,
+                  width: `${6+Math.random()*8}px`,
+                  height: `${6+Math.random()*8}px`,
+                  background: ["#ff4444","#ffd700","#00ff88","#44aaff","#aa44ff","#ff8800","#ff69b4","#00ccff"][i%8],
+                  borderRadius: Math.random()>0.5 ? "50%" : "2px",
+                  animation: `confetti-fall ${2+Math.random()*3}s linear ${Math.random()*2}s infinite, confetti-sway ${1+Math.random()*2}s ease-in-out ${Math.random()}s infinite alternate`,
+                  zIndex:1001,
+                  pointerEvents:"none"
+                }}/>
+              ))}
+
+              <div style={{background:T.bg,borderRadius:12,padding:0,maxWidth:420,width:"100%",position:"relative",zIndex:1002}}>
+                {!certGenerated ? (
+                  <div style={{padding:32,textAlign:"center"}}>
+                    <p style={{fontSize:40,marginBottom:8}}>🏆</p>
+                    <h2 style={{color:"#ffd700",fontSize:20,marginBottom:8,fontFamily:"inherit"}}>HAI COMPLETATO TUTTO!</h2>
+                    <p style={{color:T.textMuted,fontSize:12,marginBottom:24}}>{"Tutte le " + QUESTIONS.length + " domande apprese. Inserisci il tuo nome per generare il certificato."}</p>
+                    <input
+                      type="text"
+                      value={certName}
+                      onChange={e => setCertName(e.target.value)}
+                      placeholder="Il tuo nome"
+                      style={{width:"100%",padding:"10px 14px",background:T.inputBg,border:`1px solid ${T.borderLight}`,borderRadius:4,color:T.text,fontSize:14,fontFamily:"inherit",outline:"none",textAlign:"center",marginBottom:16}}
+                    />
+                    <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+                      <button onClick={() => {if(certName.trim()){try{localStorage.setItem("aelse_cert_name",certName.trim())}catch(e){} setCertGenerated(true);}}}
+                        style={{padding:"10px 24px",background: certName.trim()?"#ffd700":"#333",color:certName.trim()?"#0a0a0f":"#666",border:"none",borderRadius:4,fontWeight:700,cursor:certName.trim()?"pointer":"default",fontFamily:"inherit",fontSize:13,transition:"all 0.2s"}}>
+                        GENERA CERTIFICATO
+                      </button>
+                      <button onClick={() => setShowCert(false)}
+                        style={{padding:"10px 24px",background:"transparent",color:"#555",border:"1px solid #333",borderRadius:4,fontWeight:700,cursor:"pointer",fontFamily:"inherit",fontSize:13}}>
+                        CHIUDI
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{padding:0}}>
+                    {/* Certificate */}
+                    <div style={{
+                      margin:20,
+                      padding:32,
+                      border:"2px solid #ffd700",
+                      borderRadius:8,
+                      background:"linear-gradient(145deg, #0d0d14, #111122)",
+                      animation:"cert-glow 3s ease-in-out infinite",
+                      textAlign:"center"
+                    }}>
+                      <p style={{fontSize:10,color:"#ffd700",letterSpacing:4,marginBottom:16,textTransform:"uppercase"}}>Certificato di Preparazione</p>
+                      <div style={{width:40,height:1,background:"#ffd700",margin:"0 auto 16px",opacity:0.5}}/>
+                      <p style={{fontSize:12,color:"#888",marginBottom:8,lineHeight:1.6}}>Si attesta che</p>
+                      <p style={{fontSize:22,color:"#fff",fontWeight:900,marginBottom:8}}>{certName}</p>
+                      <p style={{fontSize:12,color:"#888",lineHeight:1.6,marginBottom:16}}>
+                        ha completato con successo tutte le <span style={{color:"#ffd700",fontWeight:700}}>{QUESTIONS.length}</span> domande del
+                      </p>
+                      <p style={{fontSize:14,color:"#ff4444",fontWeight:700,marginBottom:16}}>Aspetti Etici, Legali, Sociali ed Economici dell'Informatica</p>
+                      <div style={{width:40,height:1,background:"#ffd700",margin:"0 auto 20px",opacity:0.5}}/>
+                      <p style={{fontSize:10,color:"#666",marginBottom:4}}>Firmato</p>
+                      <p style={{fontSize:14,color:"#ccc",fontStyle:"italic"}}>Gabriele Lannutti</p>
+                      <p style={{fontSize:9,color:"#444",marginTop:16}}>{new Date().toLocaleDateString("it-IT",{day:"numeric",month:"long",year:"numeric"})}</p>
+                    </div>
+                    <div style={{textAlign:"center",padding:"0 20px 20px"}}>
+                      <button onClick={() => setShowCert(false)}
+                        style={{padding:"10px 24px",background:"transparent",color:"#ffd700",border:"1px solid #ffd700",borderRadius:4,fontWeight:700,cursor:"pointer",fontFamily:"inherit",fontSize:12}}>
+                        CHIUDI
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // STUDY MODE
+  if (mode === "study") {
+    const CAT_ORDER = [
+      {codes:["ECON"], name:"Economia, Mercati e Imprese"},
+      {codes:["COSTI"], name:"Costi, Investimenti e Progetti"},
+      {codes:["ETICA"], name:"Etica Informatica e Metodologie"},
+      {codes:["PROPR"], name:"Proprietà Intellettuale e Diritto d'Autore"},
+      {codes:["PRIV"], name:"Privacy e Protezione Dati"},
+      {codes:["SOCDIG"], name:"Società Digitale e Cittadinanza"},
+      {codes:["DEMOC"], name:"Democrazia e Partecipazione Digitale"},
+      {codes:["SWLIB"], name:"Software Libero"},
+    ];
+    const LETTERS = ["A","B","C","D","E"];
+    const grouped = {};
+    QUESTIONS.forEach(q => {
+      if (!grouped[q.cat]) grouped[q.cat] = [];
+      grouped[q.cat].push(q);
+    });
+    return (
+      <div style={{minHeight:"100vh",background:T.bg,color:T.text,fontFamily:"'JetBrains Mono','Fira Code',monospace",padding:16,overflowY:"auto"}}>
+        <div style={{maxWidth:700,margin:"0 auto"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+            <h1 style={{fontSize:18,color:"#44aaff",margin:0}}>MODALITÀ STUDIO</h1>
+            <button onClick={()=>setMode("menu")} style={{background:"transparent",border:"1px solid "+T.border,color:T.textMuted,fontSize:11,padding:"6px 14px",borderRadius:4,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>TORNA AL MENU</button>
+          </div>
+          <p style={{color:T.textMuted,fontSize:11,marginBottom:20}}>{QUESTIONS.length} domande organizzate in {CAT_ORDER.length} categorie. Tocca una categoria per espanderla.</p>
+          {CAT_ORDER.map(cat => {
+            const qs = (cat.codes || [cat.code]).flatMap(c => grouped[c] || []);
+            if (qs.length === 0) return null;
+            return (
+              <details key={(cat.codes||[cat.code]).join("_")} style={{marginBottom:8}}>
+                <summary style={{cursor:"pointer",padding:"10px 14px",background:T.cardBg,border:"1px solid "+T.border,borderRadius:4,fontSize:12,fontWeight:700,color:"#44aaff",listStyle:"none",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <span>{cat.name}</span>
+                  <span style={{color:T.textMuted,fontWeight:400,fontSize:11}}>{qs.length} domande</span>
+                </summary>
+                <div style={{borderLeft:"2px solid #44aaff",marginLeft:8,paddingLeft:12,marginTop:4}}>
+                  {qs.map((q,i) => (
+                    <div key={i} style={{background:T.cardBg,borderRadius:4,padding:12,marginBottom:6,fontSize:11,border:"1px solid "+T.border}}>
+                      <p style={{color:T.text,fontWeight:600,marginBottom:8,lineHeight:1.4}}>{q.q}</p>
+                      <p style={{color:"#00cc66",fontWeight:700,marginBottom:4}}>{q.opts[q.ans]}</p>
+                      <p style={{color:T.textMuted,fontStyle:"italic",lineHeight:1.4,fontSize:10}}>{q.expl}</p>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            );
+          })}
+          <button onClick={()=>setMode("menu")} style={{display:"block",margin:"20px auto",padding:"12px 30px",background:"#44aaff",color:darkMode?"#0a0a0f":"#fff",border:"none",fontSize:14,fontWeight:900,cursor:"pointer",borderRadius:4,fontFamily:"inherit"}}>TORNA AL MENU</button>
+        </div>
+      </div>
+    );
+  }
+
+  // RESULTS
+  if (mode === "results") {
+    const pct = Math.round((score/questions.length)*100);
+    const grade = calcGrade(score, questions.length);
+    const gradeLabel = isSimulation ? (grade >= 18 ? `VOTO STIMATO: ${grade >= 31 ? "30 e Lode" : grade}/30` : `VOTO STIMATO: ${grade}/30 (INSUFFICIENTE)`) : null;
+    const pctColor = pct>=90?"#00ff88":pct>=75?"#44aaff":pct>=60?"#ff8800":"#ff4444";
+    const verdict = pct>=90?"ECCELLENTE":pct>=75?"BUONO":pct>=60?"SUFFICIENTE":"INSUFFICIENTE";
+    return (
+      <div style={{minHeight:"100vh",background:T.bg,color:T.text,fontFamily:"'JetBrains Mono',monospace",padding:20,overflowY:"auto"}}>
+        <div style={{maxWidth:700,margin:"0 auto"}}>
+          <h1 style={{color:pctColor,fontSize:28,textAlign:"center"}}>{verdict}</h1>
+          {isSimulation && grade !== null && <p style={{textAlign:"center",fontSize:20,color:grade>=18?"#00ff88":"#ff4444",fontWeight:900}}>{gradeLabel}</p>}
+          <div style={{textAlign:"center",marginBottom:20}}>
+            <span style={{fontSize:44,color:pctColor,fontWeight:900}}>{score}/{questions.length}</span>
+            <span style={{color:T.textMuted,fontSize:13,display:"block"}}>({pct}%) — Tempo: {formatTime(elapsed)}</span>
+          </div>
+          {wrong.length>0&&(<div>
+            <h2 style={{color:"#ff4444",fontSize:15,borderBottom:`1px solid ${T.borderLight}`,paddingBottom:8}}>ERRORI DA RIPASSARE ({wrong.length})</h2>
+            {wrong.map((w,i)=>(
+              <div key={i} style={{background:T.cardBg,borderLeft:"3px solid #ff4444",padding:12,marginBottom:10,borderRadius:4,fontSize:11}}>
+                <p style={{color:"#ff8888",fontWeight:700,marginBottom:6}}>{w.q}</p>
+                <p style={{color:"#00ff88"}}>{w.opts[w.ans]}</p>
+                <p style={{color:T.textMuted,fontStyle:"italic",marginTop:4}}>{w.expl}</p>
+              </div>
+            ))}
+          </div>)}
+          <button onClick={()=>setMode("menu")} style={{display:"block",margin:"20px auto",padding:"12px 30px",background:"#ff4444",color:darkMode?"#0a0a0f":"#fff",border:"none",fontSize:14,fontWeight:900,cursor:"pointer",borderRadius:4,fontFamily:"inherit"}}>TORNA AL MENU</button>
+        </div>
+      </div>
+    );
+  }
+
+  // QUIZ
+  const q = questions[current];
+  return (
+    <div style={{minHeight:"100vh",background:T.bg,color:T.text,fontFamily:"'JetBrains Mono',monospace",display:"flex",flexDirection:"column"}}>
+      {showExitConfirm && (
+        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.85)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <div style={{background:T.cardBg,border:`1px solid ${isCleanExit ? "#44aaff" : "#ff4444"}`,borderRadius:8,padding:24,textAlign:"center",maxWidth:340}}>
+            <p style={{fontSize:14,marginBottom:16,color:T.text}}>{isCleanExit
+              ? "Vuoi tornare al menu? La tua streak è al sicuro."
+              : "Vuoi davvero abbandonare? Hai una domanda aperta — la streak verrà azzerata."
+            }</p>
+            <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+              <button onClick={confirmExit} style={{padding:"8px 20px",background:isCleanExit?"#44aaff":"#ff4444",color:"#000",border:"none",borderRadius:4,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{isCleanExit ? "TORNA AL MENU" : "SÌ, ESCI"}</button>
+              <button onClick={cancelExit} style={{padding:"8px 20px",background:"transparent",color:"#44aaff",border:"1px solid #44aaff",borderRadius:4,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>ANNULLA</button>
+            </div>
+          </div>
+        </div>
+      )}
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 16px",borderBottom:`1px solid ${T.border}`,fontSize:12}}>
+        <span style={{color:"#ff4444",fontWeight:700}}>{current+1}/{questions.length}</span>
+        <div style={{display:"flex",gap:16}}>
+          <span style={{color:"#00ff88"}}>✓ {score}</span>
+          <span style={{color:"#ff4444"}}>✗ {wrong.length}</span>
+          {streak > 0 && <span style={{color:"#ff8800"}}>{getStreakFires(streak)} {streak}</span>}
+        </div>
+        <span style={{color: isSimulation && (2400-elapsed)<300 ? "#ff4444" : T.textMuted}}>{isSimulation ? formatCountdown(elapsed) : formatTime(elapsed)}</span>
+        <button onClick={handleExit} style={{background:"transparent",border:`1px solid ${T.textFaint}`,color:T.textMuted,fontSize:10,padding:"4px 10px",borderRadius:3,cursor:"pointer",fontFamily:"inherit"}}>ESCI</button>
+      </div>
+      <div style={{height:3,background:darkMode?"#1a1a2e":"#ddd"}}><div style={{height:"100%",background: isSimulation?"#ff4444":"#44aaff",width:`${((current+1)/questions.length)*100}%`,transition:"width 0.3s"}}/></div>
+      <div style={{flex:1,display:"flex",flexDirection:"column",padding:16,maxWidth:700,margin:"0 auto",width:"100%"}}>
+        <p style={{fontSize:14,lineHeight:1.5,color:T.text,fontWeight:600,marginBottom:20,minHeight:50}}>{q.q}</p>
+        <div style={{display:"flex",flexDirection:"column",gap:8,flex:1}}>
+          {q.opts.map((opt,i)=>{
+            let bg="transparent",border=T.borderLight,col=T.textSoft;
+            if(revealed){
+              if(i===q.ans){bg=darkMode?"#0a2e0a":"#e6f9ed";border="#00ff88";col=darkMode?"#00ff88":"#007a3d"}
+              else if(i===selected){bg=darkMode?"#2e0a0a":"#fde8e8";border="#ff4444";col="#ff4444"}
+            } else if(i===selected){bg=darkMode?"#1a1a3e":"#e8eeff";border="#44aaff";col="#44aaff"}
+            return(
+              <button key={i} onClick={()=>handleSelect(i)}
+                style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 12px",background:bg,border:`1.5px solid ${border}`,color:col,fontSize:12,fontFamily:"inherit",cursor:revealed?"default":"pointer",borderRadius:4,textAlign:"left",lineHeight:1.4,transition:"all 0.15s"}}>
+                <span style={{fontWeight:900,minWidth:18,color:border===T.borderLight?T.textFaint:col}}>{LETTERS[i]}.</span>
+                <span>{opt}</span>
+              </button>
+            );
+          })}
+        </div>
+        {/* Streak toast — above explanation */}
+        {streakToast && (
+          <div style={{
+            display:"flex",
+            justifyContent:"center",
+            marginTop:8,
+            animation: "toast-in 0.3s ease-out"
+          }}>
+            <div style={{
+              padding: streakToast.style==="skull" ? "16px 24px" : streakToast.style==="epic" ? "12px 20px" : "10px 18px",
+              background: streakToast.style==="skull" ? "rgba(100,0,180,0.95)" : streakToast.style==="epic" ? "rgba(170,68,255,0.2)" : "rgba(255,136,0,0.15)",
+              border: streakToast.style==="skull" ? "2px solid #aa44ff" : streakToast.style==="epic" ? "1px solid rgba(170,68,255,0.5)" : "1px solid rgba(255,136,0,0.3)",
+              borderRadius:8,
+              textAlign:"center",
+              animation: streakToast.style==="skull" ? "toast-skull-shake 0.8s ease-in-out" : streakToast.style==="epic" ? "toast-epic-pulse 1.5s ease-in-out infinite" : "toast-glow-pulse 1.5s ease-in-out infinite"
+            }}>
+              <p style={{
+                fontSize: streakToast.style==="skull" ? 18 : streakToast.style==="epic" ? 15 : 14,
+                fontWeight:700,
+                color: streakToast.style==="skull" ? "#fff" : streakToast.style==="epic" ? "#aa44ff" : "#ff8800",
+                fontFamily:"inherit",
+                margin:0
+              }}>
+                {streakToast.fires} {streakToast.msg}
+              </p>
+            </div>
+          </div>
+        )}
+        {revealed&&(
+          <div style={{background:T.cardBg3,border:`1px solid ${T.borderLight}`,borderRadius:4,padding:12,marginTop:12,fontSize:11,lineHeight:1.5}}>
+            <span style={{color:selected===q.ans?"#00ff88":"#ff4444",fontWeight:900}}>{selected===q.ans?"✓ CORRETTO":"✗ SBAGLIATO"}</span>
+            <p style={{color:T.textMuted,marginTop:6}}>{q.expl}</p>
+          </div>
+        )}
+        <div style={{marginTop:12,display:"flex",gap:10}}>
+          {!revealed?(
+            <button onClick={handleConfirm} disabled={selected===null}
+              style={{flex:1,padding:"12px",background:selected!==null?"#44aaff":(darkMode?"#222":"#ddd"),color:selected!==null?"#000":(darkMode?"#555":"#999"),border:"none",fontSize:14,fontWeight:900,cursor:selected!==null?"pointer":"default",borderRadius:4,fontFamily:"inherit",transition:"all 0.2s"}}>
+              CONFERMA
+            </button>
+          ):(
+            <button onClick={handleNext}
+              style={{flex:1,padding:"12px",background:"#ff4444",color:darkMode?"#0a0a0f":"#fff",border:"none",fontSize:14,fontWeight:900,cursor:"pointer",borderRadius:4,fontFamily:"inherit"}}>
+              {current+1>=questions.length?"VEDI RISULTATI":"PROSSIMA →"}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(React.createElement(BiometriaQuiz));
+  </script>
+</body>
+</html>
